@@ -1,0 +1,83 @@
+\documentclass{book}
+
+\usepackage{ctex}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{chemformula}
+\usepackage{color}
+
+\usepackage{minitoc} % 每一部分前生成标题
+
+\usepackage{imakeidx} % 创建索引表
+
+% 设置代码块样式
+\lstset{
+numbersep=1.5em, % 设置语言
+ basicstyle=\ttfamily, % 设置字体族
+ breaklines=true, % 自动换行
+ keywordstyle=\bfseries\color{NavyBlue}, % 设置关键字为粗体，颜色为 NavyBlue
+ morekeywords={}, % 设置更多的关键字，用逗号分隔
+ emph={self}, % 指定强调词，如果有多个，用逗号隔开
+    emphstyle=\bfseries\color{Rhodamine}, % 强调词样式设置
+    commentstyle=\itshape\color{black!50!white}, % 设置注释样式，斜体，浅灰色
+    stringstyle=\bfseries\color{PineGreen!90!black}, % 设置字符串样式
+    columns=flexible,
+    frame=shadowbox, % 边框
+    rulesepcolor=\color{red!20!green!20!blue!20},
+    framesep=1em % 设置代码与边框的距离
+}
+
+\setcounter{tocdepth}{0} % 目录显示到章
+
+\newcommand{\keyword}[2][]{\texttt{#2}\index{#1!#2}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newenvironment{Abstract}{在本节，你将要学到：\begin{itemize}}{\end{itemize}}
+\newenvironment{attention}{\begin{center}**********以下内容为注意**********\end{center}\itshape 注意：}{\begin{center}**********以上内容为注意**********\end{center}}
+\newcommand{\sectionAuthor}[1]{本节作者：#1\\}
+
+\bibliographystyle{unsrt} % 参考文献样式
+
+\title{针对VASP的材料计算教程\\为材料计算而生}
+
+\author{Jiaqi Z.\footnote{Copyright © 2024 Jiaqi Z. All rights reserved.}}
+
+\makeindex
+
+\begin{document}
+
+    \maketitle
+
+    \frontmatter
+
+    \dominitoc
+
+    \tableofcontents
+
+    \include{preface/前言}
+
+    \include{temp.tex}
+
+    \mainmatter
+
+    \part{Linux基础}
+
+    \include{Linux基础/Linux_main}
+
+    \part{VASP计算}
+
+    \include{VASP计算/VASP_main}
+
+    \part{Python与机器学习}
+
+    \include{Python与机器学习/Python_main}
+
+    \backmatter
+
+    \printindex
+
+    \bibliography{reference}
+
+\end{document}
