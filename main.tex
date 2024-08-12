@@ -31,11 +31,13 @@ numbersep=1.5em, % 设置语言
 
 \setcounter{tocdepth}{0} % 目录显示到章
 
-\newcommand{\keyword}[2][]{\texttt{#2}\index{#1!#2}}
+\newcommand{\keyword}[1]{\texttt{#1}\index{#1}}
+\newcommand{\keywordin}[2]{\texttt{#2}\index{#1!#2}}
 \newcommand{\code}[1]{\texttt{#1}}
 
 \newenvironment{Abstract}{在本节，你将要学到：\begin{itemize}}{\end{itemize}}
 \newenvironment{attention}{\begin{center}**********以下内容为注意**********\end{center}\itshape 注意：}{\begin{center}**********以上内容为注意**********\end{center}}
+\newenvironment{extend}{\itshape 【扩展内容】：}{}
 \newcommand{\sectionAuthor}[1]{本节作者：#1\\}
 
 \bibliographystyle{unsrt} % 参考文献样式

@@ -1,0 +1,128 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{目录操作}\label{sec:目录操作}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何显示当前目录下所有文件
+    \item 如何切换至其他目录
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+\subsection{显示目录文件\keyword{ls}}\label{subsec:目录操作-显示目录文件}
+
+在这一节以及下一节，我们将讨论如何对目录和文件做基本的操作。无论是哪一种，一个最基本的前提是\emph{知道当前目录有哪些文件和目录}，从而才能进行后续操作（例如编辑、删除、移动、进入目录等）
+
+在Linux当中，列出一个目录下所有文件使用的是\code{ls}命令。在没有任何参数与选项的前提下，它输出的结果就是\emph{当前所在目录下的所有文件和目录}。以\ref{subsec:认识Linux目录-绝对路径和相对路径}一节最后的例子为例，家目录下有\code{vasp}和\code{python}两个目录，当在家目录下执行\code{ls}命令时，结果如下：
+
+\begin{lstlisting}[language=bash]
+$ ls
+vasp  python
+\end{lstlisting}
+
+同时，\code{ls}支持在后面添加一个参数表示要输出的目录。例如，在这一例子下，若在家目录当中执行命令\code{ls vasp}，将会输出\code{vasp}目录下的所有文件和目录。利用\code{..}表示上一级目录的用法，若当前处在\code{\~/vasp}目录下，使用\code{ls ..}便可得到上一级目录（即家目录）下的所有文件和目录。
+
+\subsubsection{\keywordin{ls}{ls -l}}
+
+下面介绍两个常见的\code{ls}选项，首先是\code{-l}选项，它表示\emph{以列表形式输出结果}。例如，还是上面的例子，使用这一命令的结果为：
+
+\begin{lstlisting}[language=bash]
+$ ls -l
+total 0
+drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 python
+drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 vasp
+\end{lstlisting}
+
+\begin{extend}
+每一个文件的输出结果可以分为9个部分，分别是：权限、文件硬链接数或目录子目录数、拥有者用户名、拥有者所在组、文件大小、文件修改月份、日期、时间、文件名。
+
+关于权限，可以将其分成四部分：第一部分（一个字符）表示文件类型（这里的d表示目录），第二部分（三个字符）表示拥有者权限（rwx表示可读可写可执行），第三部分（三个字符）表示组用户权限，第四部分（三个字符）表示其他用户权限（r-x）表示可读，可执行但不可编辑。
+
+对于文件硬链接数和目标子目录数，对于初始创建的文件而言，通常为1，而对于目录而言，默认为2（因为有两个子目录\code{.}和\code{..}）
+\end{extend}
+
+有时，也可以使用\keyword{ll}代替指令\code{ls -l}，其二者是完全等价的。
+
+\subsubsection{\keywordin{ls}{ls -a}}
+
+\code{-a}选项表示\emph{列出所有文件，包括隐藏文件}。例如，在\code{\~/vasp}目录下，使用\code{ls -a}命令，结果为：
+
+\begin{lstlisting}[language=bash]
+$ ls -a
+.  ..extend
+\end{lstlisting}
+
+\begin{extend}
+    正如前面所介绍的那样，任何一个空目录都会默认有两个隐藏目录--自身和它的上一级目录。而这也解释了\ref{subsec:认识Linux目录-绝对路径和相对路径}一节所介绍的\code{.}和\code{..}的本质，它们实际上就是任何当前目录下的两个子目录。
+\end{extend}
+
+\begin{attention}
+    前面所介绍的\code{-l}选项和\code{-a}选项是可以合并使用的，此时可以将两个选项之间以空格分割，如\code{ls -l -a}，或者将两个选项写在一起\code{ls -la}
+
+    当选项写在一起时，选项的排列顺序不重要。
+
+    与最开始介绍\code{ls}后面加参数表示目录一样，带有选项的\code{ls}同样可以在后面添加参数，例如，\code{ls -a vasp}表示列出当前目录下的\code{vasp}子目录下的所有文件和目录（包括隐藏文件）
+\end{attention}
+
+\subsection{关于隐藏文件}\label{subsec:目录操作-关于隐藏文件}
+
+\begin{extend}
+    隐藏文件是指在文件名前面加上\code{.}的，例如\code{.bashrc}。
+
+    隐藏文件在Linux当中的常见用途有：
+    \begin{itemize}
+        \item 配置文件
+        \item 临时文件
+        \item 缓存文件
+        \item 等
+    \end{itemize}
+
+    总而言之，隐藏文件是为了防止误操作而存在的。（这可能与一些人认为的“隐藏文件是避免别人看到”不同）事实上，哪怕在Windows操作系统中，隐藏文件也是存在且方便查看的\footnote{在Windows操作系统中，可以通过右键-属性-隐藏的方式将文件或文件夹设置为隐藏；相对地，对Windows10操作系统而言，可以通过文件夹菜单栏的“查看”-“隐藏的项目”找到那些隐藏文件。只不过在Linux当中，隐藏文件使用前面加点\code{.}的方式设置，但无论如何，隐藏文件永远不是不让别人看见的方法，如果想达成这一目的，正确的方法是设置权限。}
+\end{extend}
+
+\subsection{切换目录\keyword{cd}}\label{subsec:目录操作-切换目录}
+
+在Linux当中，切换目录使用的命令是\code{cd}，通常来说，后面需要配合一个参数，表示\emph{要切换到哪里}。例如，使用命令\code{cd /home}则是将当前目录切换到\code{/home}目录下。配合以\code{..}，可以使用\code{cd ..}切换到上一级目录。
+
+思考：如果使用\code{cd .}，会得到什么结果？
+
+答案：\rotatebox{180}{这个命令的含义是\emph{切换到当前目录}，最终效果就是什么也不发生}
+
+特殊的，对于家目录而言，除了可以使用\code{cd \~}外，Linux也支持直接使用\code{cd}，不添加任何参数实现这一功能，即二者是等价的。
+
+\subsection{错误处理}\label{subsec:目录操作-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{-bash: cd: <目录名>: Not a directory}
+
+\code{cd}后面的参数必须是目录，不能是文件。如果参数是文件，则会报该错误。
+
+如果不知道哪个是目录，哪个是文件，可以使用\code{ls -l}查看第一个字符（文件类型），如果第一个字符是\code{d}，则表示目录，如果是\code{-}，则表示文件\footnote{在一些比较新的终端程序中，可能会将文件和目录以不同颜色区分。例如，在MobaXterm当中，默认情况下文件是白色，目录是蓝色。当然，这些颜色设置都是可以通过Settings-Terminal-Default color settings设置颜色主题，这里所说的这一例子为“Dark background / Light text”主题}。例如，
+
+\begin{lstlisting}[language=bash]
+$ ls -l
+total 4
+-rw-rw-r-- 1 zjq zjq 4 Aug 12 17:12 INCAR
+drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 python
+drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 vasp
+\end{lstlisting}
+
+表示\code{INCAR}是文件，而\code{vasp}和\code{python}是目录。如果执行了\code{cd INCAR}，则会报错。
+
+\subsubsection{-bash: cd: <目录名>: Permission denied}
+
+这表明你尝试进入一个你没有权限的目录。例如，在\code{/home}目录下，有\code{ljk}和\code{zjq}两个目录，分别表示两个用户。如果执行\code{ls -l}则会发现：
+
+\begin{lstlisting}[language=bash]
+$ ls -l
+total 32
+drwx------  13 ljk    ljk    4096 Aug  5 17:34 ljk
+drwx------  75 zjq    zjq    4096 Aug 12 17:12 zjq
+\end{lstlisting}
+
+很显然，每个目录只有目录拥有者自己可以访问。例如，作为用户\code{zjq}，当尝试执行\code{cd ljk}时，则会报错。
+
+\begin{extend}
+    这种情况有一个特例：root用户。对于root用户而言，可以进入任何目录。但通常来说，root用户是由服务器管理者所持有的，作为一般用户而言，不需要也不应该进入没有权限的目录，或者执行没有权限的操作\footnote{“删库跑路”这件事对于一般用户来说是不可能的}。
+\end{extend}

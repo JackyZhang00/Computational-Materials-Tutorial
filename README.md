@@ -23,6 +23,13 @@ A repository for notes and resources related to our computational materials rese
 4. 在该节后面的“错误处理”部分，会介绍如何处理报错或异常结果，并给出解决方案。请查找是否有你需要的解决方案，并尝试解决。如果已经解决，进入第5步；否则重新查找新的解决方案；若所有解决方案都无法解决，请提交Issue或者贡献Pull Request
 5. 放下教程，继续你的研究；或者阅读这一章其他内容，了解其他相关内容。
 
+## 章节内容安排（目前已经完成或正在编写中）
+
+- Linux基础
+  - Linux命令行操作
+- VASP计算
+- Python与机器学习
+
 ## 如何为本教程做出贡献
 
 请根据目录下`如何按照格式规范编写.md`所述要求与流程，并参考`temp.tex`和`sample.tex`文件所提供的模板，提交Pull Request。

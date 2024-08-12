@@ -67,6 +67,19 @@
     当你写注意语句时，不需要在前面加任何符号。
 \end{attention}
 
+类似地，对于一些补充性质的内容，可以使用\verb|extend|环境，例如：
+\begin{lstlisting}[frame=line]
+    \begin{extend}
+        这是一段补充的内容，同样不需要在前面加任何符号。
+    \end{extend}
+\end{lstlisting}
+
+编译后的结果为：
+
+\begin{extend}
+    这是一段补充的内容，同样不需要在前面加任何符号。
+\end{extend}
+
 \subsection{数学公式}\label{subsec:关于如何编写模板（教程）-数学公式}
 
 当你希望添加数学公式时，请使用\verb|equation|环境。同时，在使用\verb|\label|语句进行标签注明时，请如同代码所示那样，添加“节标题”避免冲突且方便引用。
@@ -174,16 +187,16 @@ NSW = 1
 \keyword{SIGMA}
 \end{lstlisting}
 
-从而在表述关键字的同时创建索引。同时，也可以使用\verb|\keyword[]{}|的形式创建带有所属关系的索引，例如
+从而在表述关键字的同时创建索引。同时，也可以使用\verb|\keywordin{}{}|的形式创建带有所属关系的索引，例如
 
 \begin{lstlisting}[frame=line]
-\keyword[INCAR]{SIGMA}
+\keywordin{INCAR}{SIGMA}
 \end{lstlisting}
 
 便是创建了属于\code{INCAR}条目下的\code{SIGMA}索引。
 
 \begin{attention}
-    在编写时，鼓励使用索引方便他人根据关键字直接检索。在创建索引时，请提前确认现有的索引表是否有现成的索引。例如，\\\verb|\keyword{SIGMA}|和\verb|\keyword[INCAR]{SIGMA}|会得到不同的结果。
+    在编写时，鼓励使用索引方便他人根据关键字直接检索。在创建索引时，请提前确认现有的索引表是否有现成的索引。例如，\\\verb|\keyword{SIGMA}|和\verb|\keywordin{INCAR}{SIGMA}|会得到不同的结果。
 
     同时，在编写过程中已经将输出和索引集成在一个命令中，你不需要特地再编写一个输出的命令如\code{SIGMA$\backslash$keyword\{SIGMA\}}，只需要使用\\\code{$\backslash$keyword\{SIGMA\}}便可在输出\code{SIGMA}的同时创建索引。
 \end{attention}
