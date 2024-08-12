@@ -1,0 +1,97 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{文件操作}\label{sec:文件操作}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何移动文件（目录），如何给文件（目录）重命名
+    \item 如何删除文件（目录）
+    \item 如何复制文件（目录）
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+这一节，我们专注于文件的相关操作。类似于Windows的基本操作，Linux的文件操作也无外乎就是\emph{移动、删除、复制}。同时，这一节的许多命令对于文件和目录都是适用的，但可能会有一个注意事项，这往往会出错。
+
+\subsection{移动文件\keyword{mv}}\label{subsec:文件操作-移动文件}
+
+在Linux当中，移动文件使用的命令是\code{mv}。其基本用法是\code{mv <源文件路径> <目标文件路径>}。例如，我们在\code{vasp}目录下，希望将里面的\code{OUTCAR}移动至上一级目录，可以使用\code{mv OUTCAR ..}。类似地，对于更复杂的文件移动，只不过在描述路径时稍微复杂一点，其他的步骤没有什么不同。
+
+如果你足够敏感，也许会发现一点问题：\emph{为什么前面的命令，\code{OUTCAR}是文件，而\code{..}是目录}？两个难道不应该统一吗？
+
+对于这个问题，可以分两个部分讨论：如果前面是文件，后面也是文件，例如\code{mv OUTCAR ../OUTCAR}，这个命令与前面的命令效果是完全等价的。但是，有趣的地方在于，如果你试着执行\code{mv OUTCAR ../INCAR}的话，你会发现，Linux将\code{OUTCAR}移动到\code{..}的同时，还将其改名为\code{INCAR}。
+
+进一步想一下，如果我们现在直接写成\code{mv OUTCAR INCAR}的话，可以将其看作把当前目录下的\code{OUTCAR}移动至当前目录，同时改名为\code{INCAR}，总的效果就是，文件被重命名为\code{INCAR}。
+
+\begin{attention}
+    正如你所见到的那样，Linux没有单独的重命名文件命令，而是通过\code{mv}命令来完成。
+\end{attention}
+
+进一步，如果前后两个参数都是目录会发生什么呢？很简单，\emph{就是将前面的目录移动至后面的目录}，从效果上看，近似于将第一个参数的目录看作文件。
+
+\begin{attention}
+    与文件移动类似的操作，如重命名，对目录的移动同样成立。
+\end{attention}
+
+\subsection{如何删除文件\keyword{rm}}\label{subsec:文件操作-如何删除文件}
+
+相比于移动文件需要两个参数，删除文件的命令\code{rm}只需要一个参数即可，也许你也能猜到这个参数的含义，即\code{rm <删除的文件路径>}。例如，要删除当前目录下的\code{INCAR}文件，只需要执行\code{rm INCAR}即可。同样的，你也可以使用更复杂的绝对路径或相对路径，例如，删除上一级目录下的\code{OUTCAR}文件，可以使用\code{rm ../OUTCAR}。
+
+\begin{extend}
+    与Windows不同，Linux删除文件通常是直接删除，而不是放在所谓的\emph{回收站}内。因此，在删除文件时务必小心。
+
+    在有些版本的Linux（例如Ubuntu）当中，删除的文件被移动至\code{/home/<用户名>/.local/share/Trash/files}当中，这个目录起到的临时的\emph{回收站}功能，但你不应该寄希望于这个功能，而是仔细检查删除文件的正确性，并做好合适的备份。
+\end{extend}
+
+对于删除目录而言，情况有点特殊，需要使用\keywordin{rm}{rm -r}命令删除一个目录，此时后面所接参数为目录的路径，例如，删除当前目录下的\code{vasp}目录，则可以使用\code{rm -r vasp}。
+
+\begin{attention}
+    \code{-r}选项通常表示\emph{递归}，例如，在\code{rm -r}当中，表示\emph{递归删除}，从而达到删除一个目录的效果。在删除目录时会连同里面的所有内容都删除掉，因此需要特别小心。
+
+    如果担心删除错误的文件，可以在选项中使用\code{-i}。\keywordin{rm}{rm -i}表示\emph{在删除时}询问是否删除。
+
+    对于空目录而言，Linux还提供了一个命令\keyword{rmdir}，其用法为\code{rmdir <目录路径名>}，可以删除一个\emph{空目录}。
+\end{attention}
+
+\subsection{如何复制文件\keyword{cp}}\label{subsec:文件操作-如何复制文件}
+
+复制文件的命令为\code{cp}，其用法与移动文件\code{mv}几乎完全一样，无非就是将\emph{移动}改为\emph{复制}。简单来说，语法就是\code{cp <源文件路径> <目标文件路径>}，类似于\ref{subsec:文件操作-移动文件}当中所介绍的重命名方法，使用\code{cp}命令同样可以做到复制的同时重命名。例如，\code{cp vasp/OUTCAR ../INCAR}表示将\code{vasp}目录下的\code{OUTCAR}文件复制到上一层目录，并重命名为\code{INCAR}
+
+如果想要复制一个目录，也需要使用选项\keywordin{cp}{cp -r}。例如，\code{cp -r vasp/ python/}表示将\code{vasp}目录复制到当前目录并重命名为\code{python}。
+
+\begin{attention}
+    我们在上面的命令当中使用\code{vasp/}和\code{python/}表示两个目录。其中使用了符号\code{/}作为结尾，这个符号通常强调该路径是个目录。对于Linux本身而言，有没有这个符号并没有区别。例如，\code{cp -r vasp python}也可以表示上面的操作。我们这么写只是为了强调这两个路径是目录而不是文件。
+\end{attention}
+
+\subsection{一次性处理多个文件}\label{subsec:文件操作-一次性处理多个文件}
+
+前面介绍的\code{rm}，\code{cp}，\code{mv}，以及在\ref{sec:目录操作}一节所介绍的\code{mkdir}，都是可以针对多个文件同时操作的。以\code{rm}为例，如果想同时删除多个文件，只需要在后面添加多个参数即可，其中参数之间以空格分割。例如，\code{rm INCAR KPOINTS}表示删除当前目录下的\code{INCAR}文件和\code{KPOINTS}文件。对于\code{mkdir}创建多个目录而言，也是一样的用法，例如，使用\code{mkdir vasp ML}表示在当前目录下创建\code{vasp}目录和\code{ML}目录。
+
+对于\code{cp}和\code{mv}而言，情况稍有不同。它们自身就需要两个参数，第一个是源路径，第二个是目标路径。如果有多个文件需要处理，Linux默认\emph{最后一个路径为目标路径，前面的所有参数都是源路径}。例如，\code{cp INCAR KPOINTS POSCAR POTCAR ..}表示将\code{INCAR}，\code{KPOINTS}，\code{POSCAR}和\code{POTCAR}复制到上一级目录中。
+
+\begin{attention}
+    对于\code{cp}和\code{mv}而言，若一次性移动多个文件，则最后一个参数必须是目录。这就意味着不能进行重命名操作。
+\end{attention}
+
+
+\subsection{错误处理}\label{subsec:文件操作-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{rmdir: failed to remove <路径名>: Directory not empty}
+
+使用\code{rmdir}命令时，\emph{只能用来删除空目录}。当要删除的目录不是空目录时，执行该命令则会报错。使用\code{rm -r <路径名>}往往是删除非空目录的常见方法。
+
+\subsubsection{cp: -r not specified; omitting directory <路径名>}
+
+当使用\code{cp}复制目录时，需要添加\code{-r}选项。如果没有添加这一选项则会报错。
+
+\subsubsection{cp: target <路径名> is not a directory}
+
+这通常出现在尝试使用\code{cp}复制多个文件时，最后的参数\emph{必须是目录}。如果此时不是目录，则会报错。
+
+\subsubsection{rm: cannot remove <路径名>: Is a directory}
+
+类似于\code{cp}复制目录，使用\code{rm}删除目录时，也需要添加\code{-r}选项。特别地，对于一次性删除多个文件，如果在删除文件的同时也存在把目录删除的情况，也需要添加这一选项。
+
+
+

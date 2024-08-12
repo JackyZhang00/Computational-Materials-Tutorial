@@ -5,6 +5,7 @@
 % 请在下方的item内填写本节知识点
 \begin{Abstract}
     \item 如何显示当前目录下所有文件
+    \item 如何创建目录
     \item 如何切换至其他目录
 \end{Abstract}
 
@@ -81,6 +82,18 @@ $ ls -a
     总而言之，隐藏文件是为了防止误操作而存在的。（这可能与一些人认为的“隐藏文件是避免别人看到”不同）事实上，哪怕在Windows操作系统中，隐藏文件也是存在且方便查看的\footnote{在Windows操作系统中，可以通过右键-属性-隐藏的方式将文件或文件夹设置为隐藏；相对地，对Windows10操作系统而言，可以通过文件夹菜单栏的“查看”-“隐藏的项目”找到那些隐藏文件。只不过在Linux当中，隐藏文件使用前面加点\code{.}的方式设置，但无论如何，隐藏文件永远不是不让别人看见的方法，如果想达成这一目的，正确的方法是设置权限。}
 \end{extend}
 
+\subsection{创建目录\keyword{mkdir}}\label{subsec:目录操作-创建目录}
+
+如果所有操作都在家目录下进行，那文件管理就太复杂了。试想一下，在科研里面算了好几年的结果，全部“一股脑”堆在一起，既难找，也容易忘记当时是做了什么。因此，一个好的目录管理至关重要。而前提，就是知道如何创建目录。
+
+在Linux当中，创建目录的方法是使用\code{mkdir}命令。与前面介绍的\code{ls}，以及后面要介绍的\code{cd}不同的是，\code{mkdir}必须带有一个参数，表示\emph{创建的目录路径}。对于刚开始接触的初学者，一个最简单的命令格式是：\code{mkdir <目录名>}，其中表示在当前目录下创建一个名为\code{<目录名>}的目录。例如，希望在当前目录下创建一个名为\code{ML}的目录，则可以使用命令\code{mkdir ML}。
+
+正如前面所介绍的路径，\code{mkdir}后面的路径也可以是绝对路径或相对路径。无论是哪种形式，其含义是一样的，即\emph{在你所描述的路径下创建目录}。利用这种方法，你可以在更远的层级关系下创建目录。例如，在\code{\~/vasp/lattice/Fe}目录下创建\code{\~/python/ML/plot}目录。
+
+\begin{attention}
+    你所写的路径名，应当是你所要创建的目录。这句话似乎有点绕，举个例子，如果你希望在\code{/home/zjq/vasp}下创建一个名为\code{lattice}的目录，则你需要运行的命令是\code{mkdir /home/zjq/vasp/lattice}。注意到，后面的路径实际上就是你要创建的目录。
+\end{attention}
+
 \subsection{切换目录\keyword{cd}}\label{subsec:目录操作-切换目录}
 
 在Linux当中，切换目录使用的命令是\code{cd}，通常来说，后面需要配合一个参数，表示\emph{要切换到哪里}。例如，使用命令\code{cd /home}则是将当前目录切换到\code{/home}目录下。配合以\code{..}，可以使用\code{cd ..}切换到上一级目录。
@@ -126,3 +139,13 @@ drwx------  75 zjq    zjq    4096 Aug 12 17:12 zjq
 \begin{extend}
     这种情况有一个特例：root用户。对于root用户而言，可以进入任何目录。但通常来说，root用户是由服务器管理者所持有的，作为一般用户而言，不需要也不应该进入没有权限的目录，或者执行没有权限的操作\footnote{“删库跑路”这件事对于一般用户来说是不可能的}。
 \end{extend}
+
+\subsubsection{mkdir: cannot create directory <目录名>: No such file or directory}
+
+虽然我们说可以用绝对路径或相对路径在更远的层级关系下创建目录。但这一操作的前提是，\emph{这个目录的上一级目录需要存在}。例如，当你执行\code{mkdir vasp/lattice/Fe}时，首先需要确保目录\code{vasp}和\code{vasp/lattice}存在，才会创建\code{vasp/lattice/Fe}。如果你要创建的目录其上一级目录不存在，则会报错。
+
+一个很自然的解决方法是：\emph{一层一层创建}。这种方法虽然麻烦，但可以确保目录是清晰的\footnote{如果你确实想要一个快捷的方法，可以使用选项\code{-p}。这一选项可以在遇到没有的目录时自动为你创建。例如，上面的例子也可以直接使用\code{mkdir -p vasp/lattice/Fe}，但这一操作需要保证输入内容是正确的。一旦有内容输错，则极有可能造成目录结构混乱。}。
+
+\subsubsection{mkdir: missing operand}
+
+很显然，你在使用\code{mkdir}时没有给任何参数。正如\ref{subsec:目录操作-创建目录}所说的那样，在调用\code{mkdir}时\emph{必须提供一个参数表示要创建的目录路径}。
