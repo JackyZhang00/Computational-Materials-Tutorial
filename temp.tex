@@ -1,4 +1,5 @@
-\section{关于如何编写模板（教程）}\label{sec:关于如何编写模板（教程）}
+\chapter{为创作者而作的教程}
+\section{关于如何使用\LaTeX 编写模板}\label{sec:关于如何使用LaTeX编写模板}
 
 \sectionAuthor{Jiaqi Z.}
 
@@ -7,10 +8,15 @@
     \item 一些基本的\LaTeX 语法
     \item 如何输入公式
     \item 如何插入代码
-    \item 如何插入代码块
+    \item 如何插入图片
+    \item 如何插入创建索引
 \end{Abstract}
 
-\subsection{文章结构}\label{subsec:关于如何编写模板（教程）-文章结构}
+对于创作者而言，这一部分可以帮助你快速了解\LaTeX 的基本语法，帮助你按照规范编写正确的文件。同时对于普通读者而言，这一部分也是你了解本书内容样式的一部分。
+
+因此，任何人都应当阅读这一部分\footnote{对于创作者而言，还应当试着从GitHub上寻找源码阅读}。
+
+\subsection{文章结构}\label{subsec:关于如何使用LaTeX编写模板-文章结构}
 
 请在编写正文内容时，以“节”（section）为单位创建tex文档，同时为方便引用，请在每个小节的后面按照\verb|\label{sec:节标题}|的格式创建标签。
 
@@ -52,7 +58,33 @@
 \end{itemize}
 \end{lstlisting}
 
-\subsection{一些特殊的环境}\label{subsec:关于如何编写模板（教程）-一些特殊的环境}
+\subsection{一些特殊的格式}\label{subsec:关于如何使用LaTeX编写模板-一些特殊的格式}
+
+在有些时候，会希望在书后添加一些辅助性的文字说明，可以使用\emph{脚注}。脚注应当使用命令\verb|\footnote{}|创建，例如，
+
+\begin{lstlisting}[frame=line]
+这里有一段文字\footnote{这里是说明性的脚注}。
+\end{lstlisting}
+
+编译后效果为
+
+这里有一段文字\footnote{这里是说明性的脚注}。
+
+此外，为了激发读者思考，在编写时可以添加一些简单的思考题贯穿于正文中。这些思考题不应当很难（对于较难的题目，可以放置在一节后），应当做到读者经过简单的思考（约1分钟以内）即可得到正确答案。此时在编写时应当将答案放置在题目后面，考虑到避免读者直接看到答案，所有答案都按照特定的格式排版。在编写时应当使用\verb|\answer{}|命令，例如：
+
+\begin{lstlisting}[frame=line]
+这里是思考题。
+
+\answer{倒着看便是答案}
+\end{lstlisting}
+
+排版的效果是
+
+这里是思考题。
+
+\answer{倒着看便是答案}
+
+\subsection{一些特殊的环境}\label{subsec:关于如何使用LaTeX编写模板-一些特殊的环境}
 
 为统一教程格式，当你希望添加一段让读者注意的文字时，请使用环境\verb|attention|例如，下面的语句
 
@@ -80,7 +112,7 @@
     这是一段补充的内容，同样不需要在前面加任何符号。
 \end{extend}
 
-\subsection{数学公式}\label{subsec:关于如何编写模板（教程）-数学公式}
+\subsection{数学公式}\label{subsec:关于如何使用LaTeX编写模板-数学公式}
 
 当你希望添加数学公式时，请使用\verb|equation|环境。同时，在使用\verb|\label|语句进行标签注明时，请如同代码所示那样，添加“节标题”避免冲突且方便引用。
 
@@ -111,7 +143,7 @@
     \int_a^bf(x)\dd{x}=F(b)-F(a)\label{eqn:数学公式-3}
 \end{gather}
 
-\subsection{图片}\label{subsec:关于如何编写模板（教程）-图片}
+\subsection{图片}\label{subsec:关于如何使用LaTeX编写模板-图片}
 
 当添加图片前，请首先在相关文件夹内创建名为\verb|fig|的文件夹，在插入图片时如正常\LaTeX 代码插入即可。即使用下面的代码方式
 
@@ -135,7 +167,7 @@
     在引用图片时，务必使用\verb|\ref{fig:图片-标签}|进行引用。例如，图\ref{fig:图片-标签}。不要使用“如上图”、“如下图”的表述形式，以免图片位置发生移动造成指代不明。
 \end{attention}
 
-\subsection{代码}\label{subsec:关于如何编写模板（教程）-代码}
+\subsection{代码}\label{subsec:关于如何使用LaTeX编写模板-代码}
 
 代码使用\verb|lstlisting|环境。
 
@@ -179,7 +211,7 @@ NSW = 1
 
 \end{attention}
 
-\subsection{添加索引}
+\subsection{添加索引}\label{subsec:关于如何使用LaTeX编写模板-添加索引}
 
 建议在编写过程中，为文中的程序关键字创建索引。为方便使用，可以使用命令\verb|\keyword{}|。例如，在VASP讲解SIGMA函数时，可以使用下面的代码
 

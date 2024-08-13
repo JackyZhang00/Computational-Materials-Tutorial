@@ -1,0 +1,135 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{查看文件}\label{sec:查看文件}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item Linux文件类型
+    \item 如何查看Linux文件
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+这一节看似知识点不多，但命令还是挺多的。因此，一节只讲这一部分内容完全足够了。
+
+\subsection{Linux文件类型}\label{subsec:查看文件-Linux文件类型}
+
+\begin{extend}
+    在\ref{subsec:目录操作-显示目录文件}当中，我们介绍了\code{ls -l}命令可以以列表形式查看文件。当时仅仅提到，第一个字符如果是\code{d}则表示\emph{目录}，如果是\code{-}则表示\emph{普通文件}。在这一部分，我们稍微详细介绍一下更多的文件类型。
+
+    \begin{itemize}
+        \item 普通文件（\code{-}）：就是普通的文件，通常可以分为\emph{文本文件}，\emph{可执行文件}和\emph{压缩文件}等；
+        \item 目录（\code{d}）：在Linux当中，目录也是一种文件，该文件下存放的是这一目录下的\emph{inode}号（又名\emph{索引节点}）和文件名等信息。当执行打开文件时，Linux实际上是通过inode号找到当前文件所在block（8个磁盘扇区组成一个block），从而执行文件；
+        \item 设备文件，又分为\emph{块设备文件}（\code{b}）和\emph{字符设备文件}（\code{c}）。其中前者可以以“块”为单位进行访问（例如硬盘，软盘等），而后者则是以“字节流”的方式访问（例如字符终端、键盘等）。一般来说，设备文件存放在\code{/dev/}目录下；
+        \item 链接文件（\code{l}）：一般情况下指的是符号链接（软链接），类似于Windows操作系统下的“快捷方式”。创建符号链接的方法是使用\keyword{ln}的\keywordin{ln}{ln -s}选项\footnote{相对地还有“硬链接”，直接使用\code{ln}即可。对于硬链接而言，二者本质上是一个文件（类似于做了备份），当其中一个删除时，另一个不会删除；当其中一个文件修改时，另一个也会同时修改}，例如，\code{ln -s INCAR INCAR\_link}表示创建了一个指向\code{INCAR}文件的链接文件\code{INCAR\_link}。当源文件删除时，符号链接文件也会删除；
+        \item 管道文件（\code{p}）：通常用于进程间的通信，创建方法是\keyword{mkfifo}命令\footnote{也许你会疑惑为什么是fifo而不是管道的单词pipe。事实上，FIFO是一种数据缓存器执行方法，即“先进先出”（First In First Out）。作为数据缓存器，其与普通存储器的区别是没有外部读写地址线，这样使用起来非常简单，但缺点就是只能顺序写入数据，顺序的读出数据。数据地址在内部由指针自动加1实现，而不能通过地址线寻找地址。而Linux进程间的通信大多就是采用这种通信方式，这种方式也是管道的特性。相对的，还有一种LIFO，即“后进先出”（Last In First Out），通常“堆栈”（Stack）就是采用这种方法。}，即\code{mkfifo fifo\_file}。
+        \item 套接字文件（\code{s}）：用于通信（尤其是网络上的通信）。简单来说，这是为了避免多个进程或多个TCP连接同时在一个TCP协议端口传输数据造成混淆。一般来说，套接字文件包含目的IP地址，传输层使用协议（TCP或UDP）和使用的端口号，利用套接字文件将三个参数组合起来，从而在传输过程中实现并发服务。
+    \end{itemize}
+\end{extend}
+
+\subsection{查看文件内容\keyword{cat}，\keyword{tac}}\label{subsec:查看文件-查看文件内容}
+
+在整个Linux使用过程中，最关键的仍然是\emph{普通文件}和\emph{目录}。虽然其他文件对于操作系统本身而言也很重要，但对于非计算机相关专业的科研用户而言，其意义不大。上面的介绍仅仅是作为一个补充。下面地内容将专注在文件本身。首先一个关键的问题是：\emph{如何查看文件内容}。
+
+\begin{attention}
+    当然，从文件操作本身来说，第一件事应当是创建文件。但是，创建文件需要的内容较多（例如，需要一些\code{vi}编辑器的使用，可能还需要重定向命令，在后面的章节再详细介绍。
+    
+    如果是初学者，希望可以尽快上手的话，你可以试着在Windows本地用记事本创建一个文本文件，并在里面随意输入一些你喜欢的文字（建议使用英文，对于中文等非ASCII字符而言，可能会出现乱码。），然后利用远程终端将文件发送至服务器（对于MobaXterm而言，在终端左侧有一个目录列表，你可以直接将文件拖拽至相应的目录中；对于其他终端软件，请参考其软件具体的操作方法）。后面对文件的查看操作，都可以对这个文本文件进行。
+\end{attention}
+
+首先需要了解的是，如何查看完整的文件。在Linux当中，查看文件内容的命令是\code{cat}，其基本用法是\code{cat <文件路径名>}例如，对于位于当前目录下的\code{INCAR}文件，可以使用\code{cat INCAR}查看其内容。
+
+\code{cat}命令有一些常用选项，例如，可以使用\keywordin{cat}{cat -n}或\keywordin{cat}{cat -b}显示行号，二者的区别在于前者会显示所有行号，而后者只对有内容的行显示行号。如果文本中空行内容太多，可以使用\keywordin{cat}{cat -s}对空行进行压缩，使其缩减为一个空行。
+
+相对地，命令\code{tac}也是查看所有内容，只不过它是\code{从最后一行倒着输出}。可以看出，\code{tac}本身就是命令\code{cat}倒着写。例如，\code{tac INCAR}表示从最后一行开始输出\code{INCAR}文件。
+
+\begin{attention}
+    命令\code{cat}并不是单词“猫”的意思，而是连接concatenate的缩写。正如单词所表示的那样，\code{cat}最原始的功能，是连接多个文件。例如，有一个文件叫\code{a}，另一个文件叫\code{b}，执行命令\code{cat a b}，则会将两个文件内容按照顺序连接起来并输出。
+\end{attention}
+
+\subsection{关于文件后缀名}\label{subsec:查看文件-关于文件后缀名}
+
+对于熟悉Windows的用户而言，看到上面（包括之前的所有示例）也许都会有一个疑惑：在Linux当中，文件名为什么没有后缀？事实上，后缀名的重要性仅仅是Windows操作系统给你的一个“错觉”，让你误以为\emph{后缀名很重要}。事实上，\emph{Windows操作系统的文件名后缀并不会影响这个文件本身}。
+
+例如，在Windows操作系统下创建一个文本文件，后缀名为\code{.txt}，此时试着将其后缀名改为\code{*.mp3}或者\code{*.jpg}等，并再次在打开方式中用记事本打开（如果使用默认的打开方式一定会出现错误，例如音乐播放器或者图片查看器等）。可以发现，用记事本打开的结果与之前的文本文件内容是完全一样的。
+
+\begin{attention}
+    虽然表示后缀名的\code{.}可以任意放置，但有一个地方比较特殊--文件名开头。对于以\code{.}开头的文件名而言，它表示的含义是隐藏文件（这在\ref{subsec:目录操作-关于隐藏文件}一节介绍过了）
+\end{attention}
+
+对于Windows操作系统而言，使用后缀名往往是为了决定文件的打开方式（取决于Windows特有的\emph{注册表}）；而Linux文件大多都是文本文件（甚至系统配置也是文本文件），因此在Linux当中，文件后缀名就变得不重要了。也正因如此，在Linux当中你可以类似于Windows后缀名的方式创建任何的后缀（\code{*.jpg},\code{*.xyz}甚至\code{*.zjq},\code{*.ykn}都是可以的），在Linux看来，它们仅仅是文件名的一部分。
+
+甚至，在Linux当中，大多时候文件都是没有后缀名的。这也就是之前的\code{INCAR}和\code{OUTCAR}为什么没有后缀。对于从Windows创建的文本文件上传至服务器而言，可能还留有所谓的后缀名\code{*.txt}，你完全可以使用\code{mv}命令将后缀名删去，丝毫不影响文件本身和其他命令的运行。
+
+\subsection{按页查看文件\keyword{more}，\keyword{less}}\label{subsec:查看文件-按页查看文件}
+
+使用\code{cat}和\code{tac}查看文件，都是“一股脑”输出到终端里，对于比较短的文件而言，这种方法是可行的；如果这个文件很长，则要上下翻页就会比较繁杂。
+
+对于多页的文件而言，Linux可以使用\code{more}命令查看。基本用法是\code{more <文件路径名>}。例如，使用\code{more ../band/OUTCAR}就可以查看上一级目录下的\code{band}目录下的\code{OUTCAR}文件。在查看过程中，可以\emph{使用空格进行翻页，使用回车进行下一行查看}。
+
+在查看过程中，可以随时使用\code{q}键退出。
+
+对于一些需要往回翻页查看的文件，可以使用\code{less}命令。基本调用格式与\code{more}类似，即\code{less <文件路径名>}。与\code{more}不同的是，\code{less}命令可以向上翻页（使用\code{Page Up}键或者\code{b}键）\footnote{除次之外，也可以使用\code{d}向后翻半页，使用\code{u}向前翻半页。}
+
+\begin{attention}
+    对于\code{more}而言，实际上也可以通过\code{b}键实现向前翻一页的效果。但相比于\code{less}而言，\code{more}的自由性并不是太高。而且，使用\code{b}向前翻页的效果对于管道文件无法实现。
+
+    此外，\code{less}还有更复杂的“搜索功能”，例如，可以使用符号\code{/<字符串>}的方法实现向下搜索，使用符号\code{?<字符串>}的方法实现向上搜索。同时，\code{less}的其他命令都是在显示文件后的操作，并不是类似于之前的“选项”（即使用\code{-}的形式），这种方法与vi的使用类似。
+\end{attention}
+
+无论是\code{more}还是\code{less}，都可以使用\code{q}键退出显示文件。
+
+\subsection{取头部\keyword{head}和取尾部\keyword{tail}}\label{subsec:查看文件-取头部和取尾部}
+
+有时，可能会希望仅仅查看一个文件的开头或者结尾。此时可以使用Linux操作系统下的\code{head}和\code{tail}命令。这两个命令的基本调用方法都是一样的，即\code{head <文件路径名>}和\code{tail <文件路径名>}。例如，使用\code{head POSCAR}就可以查看当前目录下\code{POSCAR}文件开头几行，同理，使用\code{tail relax/OSZICAR}就可以查看\code{relax}目录下的\code{OSZICAR}文件结尾几行。
+
+\begin{attention}
+    通常情况下，直接调用\code{head}和\code{tail}得到的都是开头（或结尾）10行的内容。在有些时候，可能会希望输出更多行，或者少输出几行避免混乱。此时可以使用参数\keywordin{head}{head -n}和\keywordin{tail}{tail -n}实现，其基本格式为\code{head -n <行数> <文件路径名>}和\code{tail -n <行数> <文件路径名>}，这一选项表示输出指定的行数。例如，\code{head -n 5 POSCAR}可以查看\code{POSCAR}文件开头5行。对于\code{tail}同理。
+
+    除此之外，\code{head}和\code{tail}还提供了选项\keywordin{head}{head -c}和\keywordin{tail}{tail -c}，表示输出开头（或结尾）多少个字符的内容，格式与上面\code{-n}选项类似，即\code{head -c <字符数> <文件路径名>}和\code{tail -c <字符数> <文件路径名>}。
+\end{attention}
+
+\subsection{错误处理}\label{subsec:查看文件-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{cat: <文件名>: Is a directory}
+
+\code{cat}命令仅限于查看文件内容，若后面所接内容为一个目录，例如，\code{cat vasp/}则会报错
+
+\subsubsection{输入\code{cat}命令后忘记输入文件名直接回车，输入文件名后结果只输出了文件名，并没有输出内容}
+
+当直接调用\code{cat}而没有接任何参数时，表示将终端标准输入所读取到的内容输出到终端。对于普通调用\code{cat <文件路径名>}而言，是将读取到的文件输出到终端。若没有任何参数，则会读取后面输入的内容。
+
+退出的方法则是使用\code{ctrl+d}键结束当前输入，或者使用\code{ctrl+c}键强制终止当前命令。
+
+\subsubsection{cat: <文件名>: No such file or directory}
+
+文件路径不存在，检查一下路径（尤其是当前工作路径）是否正确。
+
+\subsubsection{head（或tail）: invalid number of lines: <文件名>}
+
+当你使用\code{head -n}或\code{tail -n}时，后面的行数是必须提供的一个参数。若没有提供行数，则会报错。
+
+\subsubsection{head（或tail）: cannot open <文件名> for reading: No such file or directory}
+
+文件路径不存在，检查一下路径（尤其是当前工作路径）是否正确。
+
+\subsubsection{head（或tail）: error reading <文件名>: Is a directoryy}
+
+类似于使用\code{cat}打开目录，使用\code{head}或\code{tail}打开目录就会报这种错误。
+
+\subsubsection{使用\code{more}查看文件，输出*** <文件名>: directory ***}
+
+这是因为试着用\code{more}查看目录而不是文件。
+
+\subsubsection{使用\code{less}查看文件，输出许多奇怪的路径，不是想要的内容}
+
+如果你仔细看一下里面的内容就会发现，当你用\code{less}查看目录时，输出的是这个目录下所有的文件和目录（包括隐藏文件）。事实上，使用\code{less <目录路径>}得到的结果和使用\code{ls -l <目录路径>}是一样的。只不过前者是单独输出的，而后者是直接输出在终端里。
+
+\subsubsection{Missing filename ("less --help" for help)}
+
+在调用\code{less}时忘记提供文件路径了。
+
+\subsubsection{more: bad usage Try 'more --help' for more information.}
+
+与上面的错误类似，在调用\code{more}时忘记提供文件路径了。
