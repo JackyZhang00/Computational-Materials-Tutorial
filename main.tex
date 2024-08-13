@@ -12,6 +12,11 @@
 
 \usepackage{imakeidx} % 创建索引表
 
+% 着重号
+\usepackage{xeCJKfntef}
+% \xeCJKsetup{underdot/symbol={\normalfont^^b7}}
+% \newcommand{\dotemph}[1]{\CJKunderdot{#1}}
+
 % 设置代码块样式
 \lstset{
 numbersep=1.5em, % 设置语言
@@ -34,10 +39,12 @@ numbersep=1.5em, % 设置语言
 \newcommand{\keyword}[1]{\texttt{#1}\index{#1}}
 \newcommand{\keywordin}[2]{\texttt{#2}\index{#1!#2}}
 \newcommand{\code}[1]{\texttt{#1}}
+\renewcommand{\emph}[1]{\CJKunderdot{\textbf{#1}}}
 
 \newenvironment{Abstract}{在本节，你将要学到：\begin{itemize}}{\end{itemize}}
-\newenvironment{attention}{\begin{center}**********以下内容为注意**********\end{center}\itshape 注意：}{\begin{center}**********以上内容为注意**********\end{center}}
-\newenvironment{extend}{\itshape 【扩展内容】：}{}
+% \newenvironment{attention}{\begin{center}**********以下内容为注意**********\end{center}\itshape 注意：}{\begin{center}**********以上内容为注意**********\end{center}}
+\newenvironment{attention}{\color{red}\itshape 注意：}{}
+\newenvironment{extend}{\color{gray}\itshape 补充：}{}
 \newcommand{\sectionAuthor}[1]{本节作者：#1\\}
 \newcommand{\answer}[1]{\rotatebox{180}{【答案】：#1}\vspace{2em}}
 
