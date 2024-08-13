@@ -1,0 +1,103 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{压缩与解压缩}\label{sec:压缩与解压缩}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何压缩文件
+    \item 如何解压缩文件
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+\subsection{备份和压缩}\label{subsec:压缩与解压缩-备份和压缩}
+
+\begin{extend}
+    虽然在许多场合，会将Linux的一些使用\keyword{tar}的操作说成是压缩文件和解压缩文件，但这个表述实际上是不贴切的。事实上，\code{tar}的本意是tape archive，指的是“磁带存档”，是为将若干个文件归档到磁带上，从而方便备份而设计的。而压缩文件实际上在\code{tar}当中经历了另外的步骤，即gzip压缩，或者是bzip2压缩等。这些在命令上都是通过额外的选项实现的。
+
+    但是，由于现在大多数时候都是习惯于将两个步骤合二为一，包括使用gzip压缩后得到的\code{.gz}文件也可以在Windows操作系统下解压缩，从而极大方便了文件之间的跨系统传输。因此，在通常情况下，我们使用到的都是“压缩”。这里之所以给出两者的不同仅作为补充扩展用，在后续表述中，往往不做区分，一律表述为“压缩”和“解压缩”。
+\end{extend}
+
+\subsection{使用\keyword{tar}命令压缩文件}\label{subsec:压缩与解压缩-使用tar命令压缩文件}
+
+\code{tar}命令在使用时通常会配合许多选项，在官方文档中，选项就有50个左右甚至更多，因此，我们不可能在这里完全介绍完所有的选项。对于一般的科研工作而言，只需要掌握几个最基本的选项即可。
+
+首先一个最基本的选项是\keywordin{tar}{tar -c}，表示\emph{创建备份文件}。通常仅有这一个参数是不够的，还需要配合以如\keywordin{tar}{tar -f}参数，这一参数表示\emph{指定备份文件}。结合这两个选项，可以得到一个备份文件的基本模式为：\code{tar -cf <备份文件路径> <要备份的文件1路径> <要备份的文件2路径> ...}。例如，\code{tar -cf vasp.tar INCAR KPOINTS POSCAR POTCAR}表示将当前目录下的\code{INCAR},\code{KPOINTS},\code{POTCAR}和\code{POSCAR}备份至当前目录的\code{vasp.tar}当中。
+
+\begin{attention}
+    \code{-cf}后面的参数，除第一个是备份文件路径外，后面所有参数都是要备份的文件路径。
+\end{attention}
+
+正如\ref{subsec:压缩与解压缩-备份和压缩}所说的关于压缩和备份的区别一样，我们这里所做的仅仅是备份。对于真正的压缩，我们还需要添加一个压缩格式\footnote{所谓的\emph{压缩格式}，在Windows系统下常见的如zip、rar等，而在Linux操作系统下，最常见的是gzip，当然也有如bzip、xz等。}。对于常见的gzip压缩格式而言，使用的选项是\keywordin{tar}{tar -z}。因此，一个完整的压缩命令可以表示为\code{tar -czf <压缩文件路径> <要压缩的文件1路径> <要压缩的文件2路径> ...}。
+
+\begin{attention}
+    一般情况下，使用gzip压缩的文件后缀名都是\code{.gz}。
+\end{attention}
+
+对于上面所提到的备份例子，你能想到它的压缩命令是什么吗？
+
+\answer{\code{tar -czf vasp.tar.gz INCAR KPOINTS POSCAR POTCAR}}
+
+\subsection{解压缩}\label{subsec:压缩与解压缩-解压缩}
+
+相对地，有了压缩过程，就一定会有\emph{解压缩}过程。首先，先忽略掉压缩格式（即gzip等相关内容），仅仅从备份的角度，考虑它的逆过程，也就是\emph{还原文件}。
+
+在\code{tar}当中，可以使用选项\keywordin{tar}{tar -x}实现备份文件的还原。例如，在开始的备份操作中，可以使用\code{tar -xf vasp.tar}实现对备份文件\code{vasp.tar}的还原。对于解压缩过程，选项完全类似，只需要使用\code{tar -xzf}即可。例如，对上面的\code{vasp.tar.gz}进行解压缩，可以使用\code{tar -xzf vasp.tar.gz}。
+
+\subsection{查看压缩文件}\label{subsec:压缩与解压缩-查看压缩文件}
+
+这里所说的查看压缩文件，主要指的是查看\emph{压缩包内的文件}，从更广义的角度看，就是查看所谓的“备份”文件。
+
+首先，在\code{tar}里面有一个选项\keywordin{tar}{tar -v}，可以在压缩（解压）过程中查看压缩（解压）的文件。例如，上面的压缩和解压命令，分别可以写成\code{tar -cvf vasp.tar INCAR KPOINTS POSCAR POTCAR}和\code{tar -xvf vasp.tar}。对于gzip格式的压缩和解压缩，只需要在参数里额外添加\code{-z}即可。
+
+另外一种可能的场景是已经存在一个压缩文件（例如\code{vasp.tar}），需要查看里面的内容。虽然直接解压查看是一种办法，但如果发现不是想要的文件再删除，就稍显麻烦（尤其是有多个文件时）。因此，Linux提供了一种类似于Windows直接查看压缩包文件的方法，即使用\keywordin{tar}{tar -t}表示列出压缩包内文件。
+
+\begin{attention}
+    在使用\code{tar -t}时，往往需要配合以\code{-f}参数指定压缩文件名。其完整用法为\code{tar -tf <压缩文件路径>}。例如，使用\code{tar -tf vasp.tar}可以查看\code{vasp.tar}压缩文件中的文件列表。
+
+    无论是普通的备份文件，还是使用gzip压缩的文件，都是使用\code{tar -tf}查看（没有选项\code{-z}）。
+
+    使用\code{tar -tvf}同样可以得到文件列表，只是输出的内容更详细（类似于\code{ls -l}的输出结果）
+\end{attention}
+
+除此之外，查看压缩文件还有一种方法，使用\keyword{less}命令。通过\code{less <压缩文件路径>}可以直接查看压缩文件内容，其形式上类似于\code{tar -tvf}和\code{ls -l}。
+
+\subsection{压缩文件的追加与合并}\label{subsec:压缩与解压缩-压缩文件的追加与合并}
+
+虽然已经非常小心地创建了压缩文件，但有时还是会有遗漏。例如，当你将\code{INCAR},\code{POSCAR},\code{KPOINTS}和\code{POTCAR}已经添加到\code{vasp.tar}之后，突然发现还应当把\code{CONTCAR}添加进去。如果此时文件还保留着，当然，重新使用\code{tar -cf vasp.tar ...}也是可以的（其中...表示五个文件路径）。但是，如果之前的文件已经删除了呢？解压后再重新压缩也不是不可行，但总是麻烦一步。
+
+在\code{tar}的选项中，提供了一个选项\keywordin{tar}{tar -r}表示\emph{将文件追加到压缩文件内}。例如，上面的例子，可以直接使用\code{tar -rf vasp.tar CONTCAR}即可将\code{CONTCAR}添加到\code{vasp.tar}中（哪怕原先的四个原始文件删除了也没关系）。
+
+上面的例子是将文件追加到压缩文件内，如果是\emph{将压缩文件内的所有文件全部追加到另一个压缩文件里呢}？可以使用\keywordin{tar}{tar -A}选项。其格式为\code{tar -Af <追加的目标压缩文件路径> <追加的压缩文件路径>}。例如，我们已经有了包含\code{INCAR},\code{KPOINTS},\code{POSCAR},\code{POTCAR}的压缩文件\code{vasp.tar}，此时又有一个压缩文件\code{result.tar}，里面包含有\code{OUTCAR},\code{CONTCAR}，如何将其合并到共同的\code{vasp.tar}当中呢？可以使用\code{tar -Af vasp.tar result.tar}。
+
+\begin{attention}
+    这里的选项\code{-A}是大写字母，千万不要写成小写字母。二者的含义不同，对于小写字母\keywordin{tar}{tar -a}，表示根据后缀来决定压缩格式。例如，使用\code{tar -caf vasp.tar.gz INCAR}将会以gzip格式创建压缩文件。
+
+    同时，使用\code{-A}合并压缩文件时，只能对两个文件进行合并。
+\end{attention}
+
+
+\subsection{错误处理}\label{subsec:压缩与解压缩-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{tar: <压缩文件路径>: Cannot stat: No such file or directory \\tar: Exiting with failure status due to previous errors}
+
+通常这是因为在调用\code{tar}时错误放置了压缩文件路径和被压缩的文件路径的位置。在使用\code{tar}进行压缩时，第一个参数是压缩文件路径，第二个参数是被压缩的文件路径。
+
+例如，对前面的例子，如果使用的是\code{tar -czvf INCAR KPOINTS POSCAR POTCAR vasp.tar.gz}，就会报错。
+
+\subsubsection{tar: Refusing to write archive contents to terminal (missing -f option?) \\tar: Error is not recoverable: exiting now}
+
+在使用\code{tar}进行压缩（或解压）时，需要给定选项\code{-f}并指定压缩文件名，例如\code{tar -cf vasp.tar INCAR}。如果没有选项\code{-f}则会报错。
+
+\subsubsection{tar: Cowardly refusing to create an empty archive}
+
+这意味着你在压缩文件时试图压缩空的文件。这通常是因为你没有指定压缩文件（例如，直接调用\code{tar -cf vasp.tar}就会报错）。
+
+还有一种可能是你错用了压缩选项\code{-c}和解压缩选项\code{-x}。例如，也许上面的命令你是想解压\code{vasp.tar}，那么你需要的命令是\code{tar -xf vasp.tar}。
+
+\subsubsection{tar: <压缩文件路径>: file is the archive; not dumped}
+
+这可能是因为你在压缩文件时\emph{对压缩文件本身进行压缩}，这可能会造成\emph{递归}压缩。例如，\code{tar -cf vasp.tar vasp.tar}时就会报错。
+
+但是，\emph{压缩文件本身是可以被压缩的}。例如，\code{tar -cf vasp.tar result.tar}是允许的，这执行的操作是将\code{result.tar}文件压缩至压缩包\code{vasp.tar}当中。
