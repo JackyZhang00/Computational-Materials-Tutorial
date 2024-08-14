@@ -22,7 +22,7 @@ $ ls
 vasp  python
 \end{lstlisting}
 
-同时，\code{ls}支持在后面添加一个参数表示要输出的目录。例如，在这一例子下，若在家目录当中执行命令\code{ls vasp}，将会输出\code{vasp}目录下的所有文件和目录。利用\code{..}表示上一级目录的用法，若当前处在\code{\~/vasp}目录下，使用\code{ls ..}便可得到上一级目录（即家目录）下的所有文件和目录。
+同时，\code{ls}支持在后面添加一个参数表示要输出的目录。例如，在这一例子下，若在家目录当中执行命令\code{ls vasp}，将会输出\code{vasp}目录下的所有文件和目录。利用\code{..}表示上一级目录的用法，若当前处在\code{\texttilde/vasp}目录下，使用\code{ls ..}便可得到上一级目录（即家目录）下的所有文件和目录。
 
 \subsubsection{\keywordin{ls}{ls -l}}
 
@@ -47,7 +47,7 @@ drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 vasp
 
 \subsubsection{\keywordin{ls}{ls -a}}
 
-\code{-a}选项表示\emph{列出所有文件，包括隐藏文件}。例如，在\code{\~/vasp}目录下，使用\code{ls -a}命令，结果为：
+\code{-a}选项表示\emph{列出所有文件，包括隐藏文件}。例如，在\code{\texttilde/vasp}目录下，使用\code{ls -a}命令，结果为：
 
 \begin{lstlisting}[language=bash]
 $ ls -a
@@ -88,7 +88,7 @@ $ ls -a
 
 在Linux当中，创建目录的方法是使用\code{mkdir}命令。与前面介绍的\code{ls}，以及后面要介绍的\code{cd}不同的是，\code{mkdir}必须带有一个参数，表示\emph{创建的目录路径}。对于刚开始接触的初学者，一个最简单的命令格式是：\code{mkdir <目录名>}，其中表示在当前目录下创建一个名为\code{<目录名>}的目录。例如，希望在当前目录下创建一个名为\code{ML}的目录，则可以使用命令\code{mkdir ML}。
 
-正如前面所介绍的路径，\code{mkdir}后面的路径也可以是绝对路径或相对路径。无论是哪种形式，其含义是一样的，即\emph{在你所描述的路径下创建目录}。利用这种方法，你可以在更远的层级关系下创建目录。例如，在\code{\~/vasp/lattice/Fe}目录下创建\code{\~/python/ML/plot}目录。
+正如前面所介绍的路径，\code{mkdir}后面的路径也可以是绝对路径或相对路径。无论是哪种形式，其含义是一样的，即\emph{在你所描述的路径下创建目录}。利用这种方法，你可以在更远的层级关系下创建目录。例如，在\code{\texttilde/vasp/lattice/Fe}目录下创建\code{\texttilde/python/ML/plot}目录。
 
 \begin{attention}
     你所写的路径名，应当是你所要创建的目录。这句话似乎有点绕，举个例子，如果你希望在\code{/home/zjq/vasp}下创建一个名为\code{lattice}的目录，则你需要运行的命令是\code{mkdir /home/zjq/vasp/lattice}。注意到，后面的路径实际上就是你要创建的目录。
@@ -102,7 +102,7 @@ $ ls -a
 
 \answer{这个命令的含义是\emph{切换到当前目录}，最终效果就是什么也不发生}
 
-特殊的，对于家目录而言，除了可以使用\code{cd \~}外，Linux也支持直接使用\code{cd}，不添加任何参数实现这一功能，即二者是等价的。
+特殊的，对于家目录而言，除了可以使用\code{cd \texttilde}外，Linux也支持直接使用\code{cd}，不添加任何参数实现这一功能，即二者是等价的。
 
 \subsection{错误处理}\label{subsec:目录操作-错误处理}
 % 请在本节列出可能遇见的错误与解决方法
