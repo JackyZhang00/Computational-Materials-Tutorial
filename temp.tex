@@ -120,13 +120,13 @@
 
 \begin{lstlisting}[frame=line]
 \begin{equation}
-    \label{eqn:数学公式-1}
+    \label{eqn:关于如何使用LaTeX编写模板-1}
     a^2+b^2=c^2
 \end{equation}
 \end{lstlisting}
 
 \begin{equation}
-    \label{eqn:数学公式-1}
+    \label{eqn:关于如何使用LaTeX编写模板-1}
     a^2+b^2=c^2
 \end{equation}
 
@@ -140,21 +140,28 @@
 
 如需要添加多行公式，请使用\verb|gather|环境或\verb|align|环境。例如，
 
+\begin{lstlisting}[frame=line]
 \begin{gather}
-    a^2+b^2=c^2\label{eqn:数学公式-2}\\
-    \int_a^bf(x)\dd{x}=F(b)-F(a)\label{eqn:数学公式-3}
+    a^2+b^2=c^2\label{eqn:关于如何使用LaTeX编写模板-2}\\
+    \int_a^bf(x)\dd{x}=F(b)-F(a)\label{eqn:关于如何使用LaTeX编写模板-3}
+\end{gather}
+\end{lstlisting}
+
+\begin{gather}
+    a^2+b^2=c^2\label{eqn:关于如何使用LaTeX编写模板-2}\\
+    \int_a^bf(x)\dd{x}=F(b)-F(a)\label{eqn:关于如何使用LaTeX编写模板-3}
 \end{gather}
 
 \subsection{图片}\label{subsec:关于如何使用LaTeX编写模板-图片}
 
-当添加图片前，请首先在相关文件夹内创建名为\verb|fig|的文件夹，在插入图片时如正常\LaTeX 代码插入即可。即使用下面的代码方式
+当添加图片前，请首先在相关文件夹内创建名为\verb|fig|的文件夹，在插入图片时如正常\LaTeX 代码插入即可。同样，在添加标签时，使用节标题作为开头方便他人引用。即使用下面的代码方式
 
 \begin{lstlisting}[frame=line]
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{图片路径}
     \caption{图片标题}
-    \label{fig:图片-标签}
+    \label{fig:关于如何使用LaTeX编写模板-标签}
 \end{figure}
 \end{lstlisting}
 
@@ -162,11 +169,11 @@
     \centering
     \includegraphics[width=1\linewidth]{fig.png}
     \caption{图片标题}
-    \label{fig:图片-标签}
+    \label{fig:关于如何使用LaTeX编写模板-标签}
 \end{figure}
 
 \begin{attention}
-    在引用图片时，务必使用\verb|\ref{fig:图片-标签}|进行引用。例如，图\ref{fig:图片-标签}。不要使用“如上图”、“如下图”的表述形式，以免图片位置发生移动造成指代不明。
+    在引用图片时，务必使用\verb|\ref{fig:节标题-标签}|进行引用。例如，图\ref{fig:关于如何使用LaTeX编写模板-标签}。不要使用“如上图”、“如下图”的表述形式，以免图片位置发生移动造成指代不明。
 \end{attention}
 
 \subsection{代码}\label{subsec:关于如何使用LaTeX编写模板-代码}
