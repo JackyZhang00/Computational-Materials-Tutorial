@@ -27,6 +27,7 @@ A repository for notes and resources related to our computational materials rese
 
 - Linux基础
   - Linux命令行操作
+  - 文本编辑工具vi和vim
 - VASP计算
 - Python与机器学习
 
