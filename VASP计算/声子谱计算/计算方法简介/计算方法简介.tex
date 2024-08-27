@@ -1,0 +1,57 @@
+\section{计算方法简介}\label{sec:计算方法简介}
+
+\sectionAuthor{Isay K.}
+
+\begin{Abstract}
+    \item 密度泛函微扰理论（DFPT）
+    \item 有限位移法（Finite Displacement Method）
+    \item 适用情境比较
+\end{Abstract}
+
+
+\subsection{密度泛函微扰理论（DFPT）}\label{sec:计算方法简介-密度泛函微扰理论（DFPT）}
+
+DFPT是一种基于第一性原理的方法，它直接从周期性边界条件的Kohn-Sham波函数计算出声子谱。在DFPT中，通过计算原子间相互作用的微扰来得到力常数矩阵，这是描述晶格动力学性质的关键量。
+
+\begin{extend}
+    1987年，Baroni、Giannozzi和Testa提出了一种新的晶格动力学性质计算方法--微扰密度泛函方法(Density Function Perturbation Theory)。DFPT通过计算系统能量对外场微扰的响应来求出晶格动力学性质。该方法最大的优势在于它不限定微扰的波矢与原胞边界(super size)正交，不需要超原胞也可以对任意波矢求解。因此可以应用到复杂材料性质的计算上。此外，能量对外场微扰的响应不仅可以推导出声子的晶体性质，还能求出弹性系数、声子展宽、拉曼散射截面等性质,这种方法本身就能算出Born effective charge dielectric constant,可以很好的预言LO-TO splitting甚至Kohn anomalies。这些优势使得DFPT一经提出就被广泛应用到了半导体、金属和合金、超导体等材料的计算上。比较常用的程序是pwscf和abinit，castep等采用的是一种linear response theory 的方法（或者称为  density perturbation functional theory，DFPT），直接计算出原子的移动而导致  的势场变化，再进一步构造出动力学矩阵。
+\end{extend}
+
+\subsection{有限位移法（Finite Displacement Method）}\label{sec:计算方法简介-有限位移法（Finite Displacement Method）}
+
+有限位移法通过在超原胞中引入原子的有限位移来模拟晶格振动。这种方法基于位移-响应理论，通过计算原子位移后系统的受力来构造动力学矩阵
+
+\begin{extend}
+    直接法，或称frozen-phonon方法，是通过在优化后的平衡结构中引入原子位移，计算作用在原子上的Hellmann-Feynman力，进而由动力学矩阵算出声子色散曲线。用该方法计算声子色散曲线最早开始于80年代初，由于计算简便，不需要特别编写的计算程序，很多小组都采用直接法计算材料性质。直接法的缺陷在于它要求声子波矢与原胞边界(super size)正交，或者原胞足够大使得Hellmann-Feynman力在原胞外可以忽略不计。这使得对于复杂系统，如对称性高的晶体、合金、超晶格等材料需要采用超原胞。超原胞的采用使计算量急剧增加，极大的限制了该方法的使用。这种方法不能很好的预言LO-TO splitting,只有在计算了Born effective charge和dielectric constant之后，进一步考虑了non-analyticity term，才能计算出；但Direct Method本身并不能给出Born effective charge和dielectric constant，所以这也是它的一个缺陷。
+\end{extend}
+
+\subsection{适用情境比较}\label{sec:计算方法简介-适用情境比较}
+
+DFPT适用情境：
+\begin{itemize}
+    \item 需要高精度声子谱的系统，尤其是小到中等大小的晶胞；
+    \item 研究者希望避免有限位移法可能引入的系统误差时。
+\end{itemize}
+\begin{attention}
+    DFPT方法计算成本较高，尤其对于大晶胞或高对称点附近的计算。
+\end{attention}
+
+有限声子法适用情境：
+\begin{itemize}
+    \item 当计算资源有限或需要对多种材料进行筛选时；
+    \item 对于大晶胞材料的初步声子谱分析。
+\end{itemize}
+
+总得来说，对于较重的任务，DFPT方法可能会造成内存溢出，且DFPT方法由于其特性而无法进行并行计算，而有限声子法可以并行。对于较小的体系，可以根据需要和组内资源选择方法。
+
+\begin{extend}
+  建议优先使用有限位移法。
+\end{extend}
+
+\begin{extend}
+    一些教程中有时候将有限位移法又称为冷冻声子法或直接法。
+    但笔者并没有找到更官方的资料说明有限位移法和冷冻声子法是同一种方法，谨奉上PHONOPY官网供读者自行分辨：https://phonopy.github.io/phonopy/index.html
+\end{extend}
+
+参考：
+http://muchong.com/html/200802/723527.html

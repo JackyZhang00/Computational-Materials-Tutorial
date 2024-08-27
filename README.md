@@ -29,6 +29,7 @@ A repository for notes and resources related to our computational materials rese
   - Linux命令行操作
   - 文本编辑工具vi和vim
 - VASP计算
+  - 声子谱计算
 - Python与机器学习
 
 ## 如何为本教程做出贡献
