@@ -9,7 +9,7 @@
 \end{Abstract}
 
 
-\subsection{密度泛函微扰理论（DFPT）}\label{sec:计算方法简介-密度泛函微扰理论（DFPT）}
+\subsection{密度泛函微扰理论（DFPT）}\label{subsec:计算方法简介-密度泛函微扰理论（DFPT）}
 
 DFPT是一种基于第一性原理的方法，它直接从周期性边界条件的Kohn-Sham波函数计算出声子谱。在DFPT中，通过计算原子间相互作用的微扰来得到力常数矩阵，这是描述晶格动力学性质的关键量。
 
@@ -25,7 +25,7 @@ DFPT是一种基于第一性原理的方法，它直接从周期性边界条件�
     直接法，或称frozen-phonon方法，是通过在优化后的平衡结构中引入原子位移，计算作用在原子上的Hellmann-Feynman力，进而由动力学矩阵算出声子色散曲线。用该方法计算声子色散曲线最早开始于80年代初，由于计算简便，不需要特别编写的计算程序，很多小组都采用直接法计算材料性质。直接法的缺陷在于它要求声子波矢与原胞边界(super size)正交，或者原胞足够大使得Hellmann-Feynman力在原胞外可以忽略不计。这使得对于复杂系统，如对称性高的晶体、合金、超晶格等材料需要采用超原胞。超原胞的采用使计算量急剧增加，极大的限制了该方法的使用。这种方法不能很好的预言LO-TO splitting,只有在计算了Born effective charge和dielectric constant之后，进一步考虑了non-analyticity term，才能计算出；但Direct Method本身并不能给出Born effective charge和dielectric constant，所以这也是它的一个缺陷。
 \end{extend}
 
-\subsection{适用情境比较}\label{sec:计算方法简介-适用情境比较}
+\subsection{适用情境比较}\label{subsec:计算方法简介-适用情境比较}
 
 DFPT适用情境：
 \begin{itemize}
@@ -45,10 +45,8 @@ DFPT适用情境：
 总得来说，对于较重的任务，DFPT方法可能会造成内存溢出，且DFPT方法由于其特性而无法进行并行计算，而有限声子法可以并行。对于较小的体系，可以根据需要和组内资源选择方法。
 
 \begin{extend}
-  建议优先使用有限位移法。
-\end{extend}
+    建议优先使用有限位移法。
 
-\begin{extend}
     一些教程中有时候将有限位移法又称为冷冻声子法或直接法。
     但笔者并没有找到更官方的资料说明有限位移法和冷冻声子法是同一种方法，谨奉上PHONOPY官网供读者自行分辨：https://phonopy.github.io/phonopy/index.html
 \end{extend}

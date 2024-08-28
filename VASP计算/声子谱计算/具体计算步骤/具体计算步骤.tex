@@ -8,51 +8,51 @@
     \item 有限位移法计算声子谱
 \end{Abstract}
 
-\subsection{计算声子谱前的结构优化}\label{sec:具体计算步骤-计算声子谱前的结构优化}
+\subsection{计算声子谱前的结构优化}\label{subsec:具体计算步骤-计算声子谱前的结构优化}
 
 \begin{attention}
   在计算声子时需要先对原胞结构做高精度的结构优化，不然得到的声子谱中很容易出现虚频。  
 \end{attention}
 
-我们以$TiTe_2$为例，以下是高精度优化的具体参数。
+我们以\ch{TiTe2}为例，以下是高精度优化的具体参数。
 
 \begin{lstlisting}[caption=INCAR]
 Global Parameters
-ISTART =  1            (Read existing wavefunction, if there)
-ISPIN  =  1            (Non-Spin polarised DFT)
-LREAL  = .FALSE.       (Projection operators: automatic)
-ENCUT  =  380        (Cut-off energy for plane wave basis set, in eV)
+ISTART =  1
+ISPIN  =  1
+LREAL  = .FALSE.
+ENCUT  =  380
 
-LWAVE  = .FALSE.        (Write WAVECAR or not)
-LCHARG = .FALSE.        (Write CHGCAR or not)
-ADDGRID= .TRUE.        (Increase grid, helps GGA convergence)
-LASPH  = .TRUE.        (Give more accurate total energies and band structure calculations)
-PREC   = Accurate      (Accurate strictly avoids any aliasing or wrap around errors)
+LWAVE  = .FALSE.
+LCHARG = .FALSE.
+ADDGRID= .TRUE.
+LASPH  = .TRUE.
+PREC   = Accurate
 NCORE = 8 
 ISYM = 0
 
 Lattice Relaxation
-NSW    =  300          (number of ionic steps)
-ISMEAR =  0            (gaussian smearing method )
-SIGMA  =  0.03         (please check the width of the smearing)
-IBRION =  2            (Algorithm: 0-MD, 1-Quasi-New, 2-CG)
-ISIF   =  3            (optimize atomic coordinates and lattice parameters)
+NSW    =  300
+ISMEAR =  0
+SIGMA  =  0.03
+IBRION =  2
+ISIF   =  3
 IOPTCELL = 1 0 0 1 1 0 0 0 0
 EDIFF = 1E-08
-EDIFFG = -1E-03      (Ionic convergence, eV/A)
+EDIFFG = -1E-03
 \end{lstlisting}
 
 为了保证优化精度足够高，其中需要注意的是：
 \begin{enumerate}
-    \item EDIFF表示电子收敛标准，至少要取1E-06，体系小的话尽量取1E-08；
-    \item EDIFFG取负值时表示力收敛标准，取1E-03；
-    \item ADDGRID表示是否添加额外网格提高精度，设定为.TRUE.；
-    \item PREC表示“精度”模式，设定为Accurate（准确）；
-    \item NSW表示电子优化步数，取300防止计算中断；
-    \item ENCUT可以自行做测试，详见VASP计算-结构优化章节（先别去找，我没写）；
+    \item \keywordin{INCAR}{EDIFF}表示电子收敛标准，至少要取\code{1E-06}，体系小的话尽量取\code{1E-08}；
+    \item \keywordin{INCAR}{EDIFFG}取负值时表示力收敛标准，取\code{1E-03}；
+    \item \keywordin{INCAR}{ADDGRID}表示是否添加额外网格提高精度，设定为\code{.TRUE.}；
+    \item \keywordin{INCAR}{PREC}表示“精度”模式，设定为\code{Accurate}（准确）；
+    \item \keywordin{INCAR}{NSW}表示电子优化步数，取300防止计算中断；
+    \item \keywordin{INCAR}{ENCUT}可以自行做测试，详见VASP计算-结构优化章节（先别去找，我没写）；
 \end{enumerate}
 
-另外，其中ISIF=3表示既优化晶格又优化原子坐标，配合IOPTCELL可以实现晶轴的单独固定，以达到计算二维材料的目的，详见VASP计算-结构优化章节（也还没写）。
+另外，其中\keywordin{INCAR}{ISIF}\code{=3}表示既优化晶格又优化原子坐标，配合\keywordin{INCAR}{IOPTCELL}可以实现晶轴的单独固定，以达到计算二维材料的目的，详见VASP计算-结构优化章节（也还没写）。
 
 下面的其他输入文件没有需要特别说明的，如有疑问请参考VASP计算-结构优化章节（哈哈，又是这）或参考VASP官网：https://www.vasp.at/wiki/index.php/The\_VASP\_Manual
 
@@ -82,15 +82,11 @@ Gamma
    0.00000000E+00  0.00000000E+00  0.00000000E+00
 \end{lstlisting}
 
-\begin{lstlisting}[caption=POTCAR]
-    （结构优化章节）
-\end{lstlisting}
-
-提交任务进行计算，得到CONTCAR为优化后的更合理的结构，作为后续声子计算的初始晶胞。
+提交任务进行计算，得到\code{CONTCAR}为优化后的更合理的结构，作为后续声子计算的初始晶胞。
 （后续小节中提到“初始晶胞”均指优化后得到的晶胞，为避免歧义在此说明。）
 
  
-\subsection{DFPT方法计算声子谱}\label{sec:具体计算步骤-DFPT方法计算声子谱}
+\subsection{DFPT方法计算声子谱}\label{subsec:具体计算步骤-DFPT方法计算声子谱}
 
 1.\code{mkdir method\_DFPT}
 
@@ -98,7 +94,7 @@ Gamma
 
 2.\code{cp relax/CONTCAR method\_DFPT/POSCAR}
 
-将上一步高精度结构优化得到的CONTCAR复制进文件夹内，并重命名为POSCAR。
+将上一步高精度结构优化得到的\code{CONTCAR}复制进文件夹内，并重命名为\code{POSCAR}。
 
 3.\code{cd method\_DFPT}
 
@@ -107,19 +103,19 @@ Gamma
 4.\code{module load conda}
 \code{conda activate phonopy}
 
-加载conda模块，并激活phonopy环境，详情可参考\ref{sec:计算软件PHONOPY-PHONOPY使用方法}
+加载\code{conda}模块，并激活\code{phonopy}环境，详情可参考\ref{subsec:计算软件PHONOPY-PHONOPY使用方法}
 
 5.\code{phonopy -d --dim="6 6 1"}
 
 使用PHONOPY进行6×6的扩胞。
 
-此时会产生数个名为POSCAR-0？的位移文件，以及名为SPOSCAR的扩胞后的结构。
+此时会产生数个名为\code{POSCAR-0？}的位移文件，以及名为\code{SPOSCAR}的扩胞后的结构。
 
-DFPT方法使用的是SPOSCAR，而有限位移法使用的是这些位移文件。
+DFPT方法使用的是\code{SPOSCAR}，而有限位移法使用的是这些位移文件。
 
 \begin{attention}
    笔者研究的是2D结构，仅对两个方向进行扩胞，读者可根据需要自行调整。
-   扩胞的标准是扩胞后达到80~100个原子，且晶轴长度大于10埃，不然得到的声子谱中很容易出现虚频。
+   扩胞的标准是扩胞后达到80\ttilde100个原子，且晶轴长度大于10埃，不然得到的声子谱中很容易出现虚频。
 \end{attention}
 
 6.\code{mkdir vasp-calculations}
@@ -127,12 +123,12 @@ DFPT方法使用的是SPOSCAR，而有限位移法使用的是这些位移文件
 新建文件夹用于后续计算。
 
 \begin{extend}
-  此处根据个人习惯不同，也可以不新建文件夹。将POSCAR重命名为POSCAR-unit，将第5步新产生的SPOSCAR重命名为POSCAR，直接在当前文件夹中进行计算。
+  此处根据个人习惯不同，也可以不新建文件夹。将\code{POSCAR}重命名为\code{POSCAR-unit}，将第5步新产生的\code{SPOSCAR}重命名为\code{POSCAR}，直接在当前文件夹中进行计算。
 \end{extend}
 
 7.\code{cp SPOSCAR vasp-calculations/POSCAR}
 
-将第5步新产生的SPOSCAR复制进文件夹，并重命名为POSCAR。
+将第5步新产生的\code{SPOSCAR}复制进文件夹，并重命名为\code{POSCAR}。
 
 8.准备其它基本文件：
 
@@ -169,9 +165,6 @@ ADDGRID = .TRUE.
  因为该计算使用的是扩胞之后的结构，所以K点没有必要取太大。
 \end{attention}
 
-\begin{lstlisting}[caption=POTCAR]
-  老方法
-\end{lstlisting}
 
 
 9.\code{sbatch sub.vasp}
@@ -180,19 +173,19 @@ ADDGRID = .TRUE.
 
 10.\code{cd ..}
 
-返回method\_DFPT文件夹。
+返回\code{method\_DFPT}文件夹。
 
 11.\code{cp vasp-calculations/vasprun.xml .}
 
-将vasprun.xml复制到当前文件夹。
+将\code{vasprun.xml}复制到当前文件夹。
 
 12.\code{phonopy --fc vasprun.xml}
 
-使用phonopy读取vasprun.xml生成力常数文件FORCE\_CONSTANTS。
+使用phonopy读取\code{vasprun.xml}生成力常数文件\code{FORCE\_CONSTANTS}。
 
 13.\code{vi band.conf}
 
-编辑band.conf文件：
+编辑\code{band.conf}文件：
 \begin{lstlisting}[caption=band.conf]
 ATOM_NAME =Ti Te
 DIM = 6 6 1
@@ -202,15 +195,15 @@ FORCE_CONSTANTS = READ
 \end{lstlisting}
 
 \begin{enumerate}
-    \item DIM根据体系的扩胞大小设置，如扩胞扩到332，就设置成332。
-    \item BAND和能带的取点是一样的，也可以用vaspkit生成。
-    \item FORCE\_CONSTANTS一定设置成READ。
+    \item \code{DIM}根据体系的扩胞大小设置，如扩胞扩到332，就设置成\code{332}。
+    \item \code{BAND}和能带的取点是一样的，也可以用vaspkit生成。
+    \item \code{FORCE\_CONSTANTS}一定设置成\code{READ}。
     \item 更多设置可以看PHONOPY官网。
 \end{enumerate}
 
 14.\code{phonopy -p -s band.conf}
 
-使用phonopy读取band.conf文件，作图并保存。
+使用phonopy读取\code{band.conf}文件，作图并保存。
 
 15.\code{phonopy-bandplot --gnuplot > phonon.out}
 
@@ -220,7 +213,7 @@ FORCE_CONSTANTS = READ
   旧版本的phonopy的导出命令为：\code{bandplot  --gnuplot> phonon.out}
 \end{extend}
 
-\subsection{有限位移法计算声子谱}\label{sec:具体计算步骤-有限位移法计算声子谱}
+\subsection{有限位移法计算声子谱}\label{subsec:具体计算步骤-有限位移法计算声子谱}
 
 1.\code{mkdir method\_yxwy}
 
@@ -234,7 +227,7 @@ FORCE_CONSTANTS = READ
 
 5.\code{for i in {01..12}; do mkdir \$i; cp POSCAR-0\$i \$i/POSCAR;done}
 
-假如第四步产生了12个位移文件，使用for循环生成12个文件夹，并将对应的位移POSCAR移入文件夹重命名为POSCAR。
+假如第四步产生了12个位移文件，使用\code{for}循环生成12个文件夹，并将对应的位移\code{POSCAR}移入文件夹重命名为\code{POSCAR}。
 
 6.准备其它基本文件：
 
@@ -280,7 +273,7 @@ Gamma
 
 8.\code{phonopy -f {01..12}/vasprun.xml}
 
-计算全部结束后，使用phonopy读取全部的计算文件夹中的vasprun.xml，生成FORCE\_SETS文件。
+计算全部结束后，使用phonopy读取全部的计算文件夹中的\code{vasprun.xml}，生成\code{FORCE\_SETS}文件。
 
 9.\code{vi band.conf}
 
@@ -292,11 +285,11 @@ Gamma
   FORCE_SETS = READ
 \end{lstlisting}
 
-与DFPT方法唯一不同的部分在于将FORCE\_CONSTANTS=READ改成FORCE\_SETS=READ。
+与DFPT方法唯一不同的部分在于将\code{FORCE\_CONSTANTS=READ}改成\code{FORCE\_SETS=READ}。
 
 10.\code{phonopy -p -s band.conf}
 
-使用phonopy读取band.conf文件，作图并保存。
+使用phonopy读取\code{band.conf}文件，作图并保存。
 
 11.\code{phonopy-bandplot --gnuplot > phonon.out}
 

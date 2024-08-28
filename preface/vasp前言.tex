@@ -1,0 +1,62 @@
+\chapter*{写在前面的一些说明}
+
+从本部分开始，就进入到了这一教程的主体部分--\emph{VASP计算}。在开始计算之前，有一些注意事项需要说明：
+
+\section*{关于输入文件}
+
+随着计算任务的不同，VASP所需要的输入文件也是不同的。对于\code{INCAR}和\code{KPOINTS}文件\footnote{这些文件的具体含义在后续教程中都会详细介绍。}，通常是与具体的计算任务有关，且可以借助于如vaspkit的脚本生成。而对于\code{POSCAR}文件而言，其表示所要计算的结构信息，对于不同的课题组、不同的研究课题，所研究的结构也会千差万别。在教程中为了演示方便，有时会设定某一特定的结构作为\code{POSCAR}文件，仅作为演示用，在实际使用时需要根据具体问题设置不同的文件。
+
+对于\code{POTCAR}文件而言，通常对于已经购买版权的课题组而言，都会有一个配套的\code{POTCAR}目录，里面会包含有所有元素的赝势文件。对于这种情况，通常使用如vaspkit的脚本生成并不是难事（同样也可以使用Linux命令手动生成，具体内容在后续章节会进行介绍）。对于没有购买版权的课题组来说，可以“暂时借用”别人已有的文件\emph{作为练习}，但不能将其用于课题组的论文当中。
+
+\section*{关于提交脚本}
+
+之前所介绍的Linux命令，在大多数课题组的系统中都是可以使用的。但VASP却不是如此。首先，不同课题组的VASP版本可能不同，有时不同版本的命令或参数含义可能会有些许变化，但这种变化通常是影响较小的。最重要的是，由于所使用的系统环境不同，例如，对于本地运行和运算集群运行，其提交任务的方法可能会有些许差异。目前，大多数课题组在计算VASP任务时都是采用服务器集群进行计算，此时就会需要一个叫做\emph{排队系统}的东西。
+
+对于不同课题组的不同集群，所使用的排队系统可能不同。本教程在编写时，通常是使用slurm作业管理系统，目前如中国科学技术大学、上海交通大学等学校的计算中心都是采用这一管理系统。对于使用其他管理系统的课题组而言，需要参考自己课题组的使用方法。
+
+\section*{使用slurm的命令与方法}
+
+考虑到教程的完整性，这一节简单介绍关于slurm的命令。
+
+\begin{attention}
+    这一部分仅仅适用于那些使用slurm作业管理系统的课题组，对于其他课题组，则需要参考自己课题组的使用方法。
+\end{attention}
+
+在使用slurm时，需要配合以一个提交任务脚本。一个典型的提交任务脚本\code{sub.vasp}如下所示：
+
+\begin{lstlisting}[caption=sub.vasp]
+#!/bin/bash
+#SBATCH -n 56
+#SBATCH -N 1
+
+# 打印任务信息
+echo "Starting job $SLURM_JOB_ID at " `date`
+echo "SLURM_SUBMIT_DIR is $SLURM_SUBMIT_DIR"
+echo "Running on nodes: $SLURM_NODELIST"
+
+# 执行任务
+## 载入vasp
+module load VASP
+ulimit -s unlimited
+mpirun vasp_std > vasp.out 2>vasp.err
+
+# 任务结束
+echo "Job $SLURM_JOB_ID done at " `date`
+\end{lstlisting}
+
+其中，\code{\#SBATCH -n}表示\emph{任务所使用的核数}，在本例中设定为56核；\code{\#SBATCH -N}表示\emph{使用的节点数}。在上述代码中，表示使用56核，1个节点进行计算。
+
+而对于中间的命令，特别的如\code{ulimit -s unlimited}表示\emph{不设置内存限制}；\code{mpirun vasp\_std > vasp.out 2>vasp.err}表示通过\code{mpirun}（即\emph{并行计算程序}）运行\code{vasp\_std}命令并将输出结果保存至\code{vasp.out}，而将错误信息输出到\code{vasp.err}当中。
+
+\begin{extend}
+    对于有显卡加速的课题组而言，可能需要在前面指定\code{\#SBATCH --partition=GPU}指定使用的GPU（如\code{a100}等），同时使用\code{\#SBATCH --gres=gpu:$n$}表示调用$n$张显卡进行计算。
+\end{extend}
+
+提交任务时，需要将提交脚本和计算目录放在一起，在计算目录下使用\keyword{sbatch}\code{ sub.vasp}\footnote{提交脚本名}即可。除此之外，slurm还有如下命令：
+
+\begin{itemize}
+    \item \keyword{squeue}表示查看当前任务队列
+    \item \keyword{scancel [jobID]}表示取消\code{[jobID]}编号的任务，例如，\code{scancel 6066}表示取消编号为6066的任务；
+\end{itemize}
+
+除此之外，slurm也可以使用如\code{srun}或\code{salloc}提交交互式作业，或者申请特定的资源并登录至节点。这一部分内容在VASP计算时不会使用到，因此不在这里介绍。
