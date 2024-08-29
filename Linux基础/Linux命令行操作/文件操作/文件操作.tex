@@ -89,6 +89,10 @@
 
 这通常出现在尝试使用\code{cp}复制多个文件时，最后的参数\emph{必须是目录}。如果此时不是目录，则会报错。
 
+\subsubsection{rm: cannot remove <路径名>: No such file or directory}
+
+表明你正在使用\code{rm}命令删除一个不存在的文件。请仔细检查你的文件路径名是否正确。
+
 \subsubsection{rm: cannot remove <路径名>: Is a directory}
 
 类似于\code{cp}复制目录，使用\code{rm}删除目录时，也需要添加\code{-r}选项。特别地，对于一次性删除多个文件，如果在删除文件的同时也存在把目录删除的情况，也需要添加这一选项。
