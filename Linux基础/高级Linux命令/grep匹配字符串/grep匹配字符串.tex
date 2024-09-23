@@ -1,0 +1,46 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{grep匹配字符串}\label{sec:grep匹配字符串}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何使用\code{grep}查找文件中的字符串
+\end{Abstract}
+
+在\ref{sec:查找与替换}一节当中，已经详细介绍了如何在vi当中进行查找和替换。正如本章一开始所说的那样，很多时候我们希望在不打开vi的前提下直接找到我们所需要的信息。或者我们希望能够在一系列类似的文件中查找同样的内容\footnote{这在后续VASP批量处理中可能十分有用，例如，我们希望查找所有\code{INCAR}文件当中的\code{ENCUT}设置情况，就需要这个方法。}，在命令行下借助于\ref{sec:通配符}一节所介绍的内容，可以很容易实现这一点。
+
+因此，本节我们需要了解如何在命令行当中直接查找特定字符串。同时，我们还将再一次“复习”关于正则表达式的内容（暂时只会用到\ref{sec:初窥正则表达式}一节所介绍过的内容）。
+
+\subsection{使用\code{grep}查找字符串}\label{subsec:grep匹配字符串-使用grep查找字符串}
+
+在Linux当中，查找文本内容的常见命令是\keyword{grep}，其基本语法为：\code{grep [匹配的内容] [文件名]}，其中\code{[匹配的内容]}是要查找的\emph{正则表达式}，而\code{[文件名]}则是希望查找的文件。
+
+\begin{attention}
+    虽然说查找的是\emph{正则表达式}，但实际上直接输入一个普通的字符串也是可行的。此时查找的内容就是普通的字符串查找。
+
+    同时，查找的文件可以有多个，甚至可以使用通配符。若没有提供文件名，\code{grep}将会从\emph{标准输入}\footnote{从终端、键盘输入}中读取内容。
+\end{attention}
+
+例如，使用\code{grep ENCUT INCAR}就可以查找在\code{INCAR}文件下所有\code{ENCUT}。
+
+同时，还可以使用\keywordin{grep}{-r}参数\emph{递归搜索目录下的所有文件}。例如，\code{grep -r ENCUT .}表示在当前目录下递归搜索\code{ENCUT}字符串。
+
+除此之外还有其他选项。例如，使用\keywordin{grep}{-v}表示\emph{查找不匹配的行}。例如，\code{grep -v ENCUT INCAR}表示打印\code{INCAR}文件中所有没有\code{ENCUT}的行；\keywordin{grep}{-i}表示忽略大小写匹配；\keywordin{grep}{-n}表示显示行号输出；\keywordin{grep}{-l}表示只打印匹配的文件名。
+
+其中多数选项都是可以混用的，例如，\code{grep -l -r ENCUT .}表示什么含义？
+
+\answer{递归查找当前目录下所有含有\code{ENCUT}的文件，并只输出文件名。}
+
+\subsection{在\code{grep}当中使用正则表达式}\label{subsec:grep匹配字符串-在grep当中使用正则表达式}
+
+在\code{grep}当中，使用正则表达式有两个地方：\emph{查找内容}和\emph{文件名}。关于文件名，大多数内容都如同\ref{sec:初窥正则表达式}一节和\ref{sec:通配符}一节所介绍的那样，例如，使用\code{grep ENCUT */INCAR}表示查找当前目录所有子目录下名为\code{INCAR}的文件当中含有\code{ENCUT}的行。
+
+除此之外，在查找的内容当中，也可以使用正则表达式，此时的用法就完全类似于在vi当中使用正则表达式进行查找（见\ref{sec:初窥正则表达式}）。
+
+
+\subsection{错误处理}\label{subsec:grep匹配字符串-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{grep: <路径名>: Is a directory}
+
+这表示你尝试在目录当中查找字符串，这显然是行不通的。如果你希望查找这一路径下所有文件，可以使用\code{grep -r <字符串> <目录名>}或者\code{grep <字符串> <目录名>/*}。
