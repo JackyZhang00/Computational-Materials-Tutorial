@@ -30,6 +30,7 @@ A repository for notes and resources related to our computational materials rese
   - 文本编辑工具vi和vim
   - 高级Linux命令
 - VASP计算
+  - 能带计算
   - 声子谱计算
 - Python与机器学习
 
