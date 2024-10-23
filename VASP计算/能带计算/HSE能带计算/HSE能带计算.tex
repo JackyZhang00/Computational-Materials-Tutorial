@@ -1,0 +1,104 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{HSE能带计算}\label{sec:HSE能带计算}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何计算HSE能带
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+在之前介绍PBE能带计算时提到，\emph{使用PBE计算会得到带隙偏小的情况}，而这对于高精度计算显然是不合适的。因此，在大多数计算能带的论文中都需要其他泛函如HSE计算得到的能带。因此，在本节我们将讨论如何使用HSE计算能带并给出更加准确的带隙。
+
+\subsection{结构优化与自洽计算}\label{subsec:HSE能带计算-结构优化与自洽计算}
+
+在本节我们将讨论的结构是金刚石，其\code{POSCAR}文件如下所示：
+
+\begin{lstlisting}[caption=POSCAR]
+C2
+1.0
+        2.5269944668         0.0000000000         0.0000000000
+        1.2634972334         2.1884414035         0.0000000000
+        1.2634972334         0.7294804678         2.0632823422
+    C
+    2
+Direct
+        0.750000000         0.750000000         0.750000000
+        0.500000000         0.500000000         0.500000000
+\end{lstlisting}
+
+对于HSE泛函计算能带，结构优化过程与前面\ref{subsec:VASP计算能带过程-结构优化}所介绍的步骤完全相同，因此这里不再赘述。
+
+对于自洽计算，\code{KPOINTS}则需要使用hse的K点。生成方法可以使用\code{vaspkit-3-302/303}生成\code{KPATH.in}后使用\code{vaspkit-25-251}生成\code{KPOINTS}，其中可以根据需要选择Monkhorst-Pack Scheme或Gamma Scheme方法生成K点\footnote{一般来说，使用Monkhorst-Pack生成K点精度较高，但对于六方晶系，则需要选择Gamma方法。}。然后需要依次输入scf所使用k点密度（通常设定为\code{0.04}）以及计算能带所需要的k点密度（通常也设定为\code{0.04}）
+
+同时，在计算scf时还需要将\code{INCAR}的\code{LWAVE = .TRUE.}以生成波函数文件，以便计算能带时使用。下面是一个参考使用的\code{INCAR}文件：
+
+\begin{lstlisting}[caption=INCAR]
+Global Parameters
+ISTART =  1
+ISPIN  =  1
+LREAL  = .FALSE.
+ENCUT  =  600   
+PREC   =  Accurate
+LWAVE  = .TRUE.  
+LCHARG = .FALSE.  
+ADDGRID= .TRUE.
+
+Static Calculation
+ISMEAR =  0       
+SIGMA  =  0.05    
+LORBIT =  11      
+NEDOS  =  2001    
+NELM   =  60      
+EDIFF  =  1E-08       
+\end{lstlisting}
+
+\subsection{HSE能带计算}\label{subsec:HSE能带计算-HSE能带计算}
+
+上一步计算完成后，将\code{KPOINTS}, \code{POTCAR}, \code{POSCAR}和\code{WAVECAR}文件拷贝（或移动）至新的目录（暂且命名为\code{hse-band}，使用\code{vaspkit-101-STH6}生成HSE计算的\code{INCAR}文件，调整必要的参数后如下所示：
+
+\begin{lstlisting}[caption=INCAR]
+Global Parameters
+ISTART =  1
+ISPIN  =  1
+LREAL  = .FALSE.
+ENCUT  =  600
+PREC   =  Accurate
+LWAVE  = .FALSE.
+LCHARG = .FALSE.
+ADDGRID= .TRUE.
+    
+Static Calculation
+ISMEAR =  0
+SIGMA  =  0.05
+LORBIT =  11
+NEDOS  =  2001
+NELM   =  60
+EDIFF  =  1E-08
+    
+HSE06 Calculation
+LHFCALC= .TRUE.
+AEXX   =  0.25
+HFSCREEN= 0.2
+ALGO   =  ALL
+TIME   =  0.4
+PRECFOCK= N
+\end{lstlisting}
+
+这里面的关键参数是\keyword{AEXX}，表示杂化泛函所占的比重，通常设定为0.25是比较合适的。但\emph{这一比值会影响到带隙的大小}，因此在必要的时候需要进行调整以适应实验结果。
+
+将上述文件提交计算，由于HSE能带计算精度较高，因此需要时间较长\footnote{在测试计算时，64核计算时间为7.7个小时。}。
+
+\subsection{HSE能带计算后处理}\label{subsec:HSE能带计算-HSE能带计算后处理}
+
+与\ref{sec:能带绘图与后处理}一节所介绍的类似，在HSE计算后也需要对数据进行处理，绘图。但在一些细节上有些许不同：
+
+\begin{itemize}
+    \item 在绘制能带图之前，需要确保当前目录下有\code{KPATH.in}文件（可以直接使用\code{vaspkit-3-302/303}的方式生成，也可以直接从之前\code{scf}目录下复制过来；
+    \item 使用\code{vaspkit-25-252}生成能带数据，所得到的\code{BAND.dat}和\code{KLINE.dat}文件可以将其放入Origin等软件中绘图（方法参考\ref{sec:能带绘图与后处理}一节，在此略）
+\end{itemize}
+
+生成能带数据后，可以通过\code{BAND\_GAP}文件查看计算得到的带隙。在本地测试时，得到结果为5.29 eV，与文献\footnote{Stoliaroff, A. \& Latouche, C. Accurate ab initio calculations on various PV-based materials: Which functional to be used? The Journal of Physical Chemistry C 124, 8467–8478 (2020).}结果5.38 eV接近。
+
+同时，我们也可以利用\ref{sec:VASP计算能带过程}所介绍的PBE能带计算方法，对金刚石的PBE带隙进行计算。结果发现其带隙为4.12 eV，显然小于HSE带隙。
