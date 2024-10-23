@@ -1,0 +1,78 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{管道与重定向}\label{sec:管道与重定向}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 管道运算符、如何使用管道运算符连接多个命令
+    \item 使用重定向写入（读取）文本文件
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+\subsection{管道}\label{subsec:管道与重定向-管道}
+
+在\ref{sec:sed文本替换}一节当中，我们讨论了如何使用\code{sed}命令对文本文件进行编辑。当时我们提到，\code{sed}命令是一个管道命令，可以读取终端输出的内容。除此之外，在很多时候我们希望对某一文件进行多次操作，例如，提取某一文件的前10行，并将其中的“C”改成“B”，然后再写入新的文件当中。
+
+像上面这种输入和输出层层传递的（一个命令的输出作为另一个命令的输入），就可以使用这一节的“管道”命令。在Linux当中，管道运算符是\code{|}（通常是Shift+Backspace下面的那个键），它的作用是\emph{把前面命令的输出作为下一个命令的参数输入}。例如，我们希望将\code{POSCAR}输出，可以使用\code{cat POSCAR}，若此时又想取出前5行，则可以使用\code{cat POSCAR | head -n 5}
+
+\begin{attention}
+    也许使用\code{head -n 5 POSCAR}一样可以解决上述问题，但使用管道更具有“可扩展性”。例如，\code{cat}命令本意是将多个文件连接起来，若希望将连接之后的文件读取前5行，则使用管道运算符是最简单的方法之一。
+\end{attention}
+
+上面的过程，可以看作是将\code{cat}命令输出结果作为\code{head}命令的参数输入，之后运行\code{head}命令并输出（至标准输出），进一步，如果我们希望将其中的“C”全部替换成“B”，则需要借助于\code{sed}命令，表示为：\code{cat POSCAR | head -n 5 | sed "s/C/B/g"}
+
+\begin{attention}
+    此时使用\code{sed}命令由于没有添加\code{-i}选项，因此结果也仅仅在标准输出当中进行输出，源文件并没有修改。
+\end{attention}
+
+类似地，如果我们希望得到\code{OUTCAR}最后一个包含“without”字符串的行，在使用管道之前是“几乎不可能”的，而在利用管道时，便可以使用命令：\code{grep without OUTCAR | tail -n 1}得到结果\footnote{这一过程实际上是在VASP当中得到最后收敛能量的过程。}。
+
+\subsection{输出重定向与输入重定向}\label{subsec:管道与重定向-输出重定向与输入重定向}
+
+在之前，我们得到的输出结果仅仅是在屏幕上输出（也被称为“标准输出”），但必要的时候，我们也希望将结果保存至本地，以便后续处理（无论是进一步使用程序语言读取并处理，还是过一段时间再看）。正因如此，寻找一种方法将输出结果保存就十分重要。
+
+在Linux当中，保存终端输出的本质就是“将输出\emph{重定向}至文件”，其运算符是\code{>}或\code{>>}，后面需要有一个文件名路径表示\emph{希望写入的文件}。其中，前者（\code{>}）表示\emph{创建}，当文件存在时则会覆盖；后者（\code{>>}）表示\emph{追加}，当文件不存在时新建，存在时则会在后面追加新的内容。
+
+有了这一方法，我们终于可以解决\ref{sec:sed文本替换}一节所遗留的关键问题：如何将编辑后的文件保存至新的文件？答案就是\emph{使用重定向运算符}。例如，我们希望将\code{INCAR}文件里面的\code{ENCUT=400}改为\code{ENCUT=600}并保存至\code{INCAR2}，则可以使用命令：\code{sed "s/ENCUT=400/ENCUT=600/g" INCAR > INCAR2}
+
+再一个例子，如果希望将\code{Si/POTCAR}和\code{O/POTCAR}合并至一个新的\code{POTCAR}当中，应当怎样写呢？
+
+\answer{\code{cat Si/POTCAR O/POTCAR > POTCAR}}
+
+\begin{extend}
+    请注意运算符是\code{>}而不是\code{<}，前者表示“输出重定向”，而后者表示“输入重定向”，即将文件的内容作为命令的输入。例如，\code{cat < POSCAR}与\code{cat POSCAR}等价。
+
+    二者的方向虽然容易混淆，但似乎可以从箭头的方向看出一点规律——\code{>}表示将命令的内容“输出至”文件中，而\code{<}表示将文件“输入至”命令中。
+\end{extend}
+
+在必要的时候，我们当然也可以将输入和输出同时重定向，例如，\code{cat < POSCAR > POSCAR2}也是可行的（将\code{POSCAR}重定向输入至\code{cat}命令，并将命令输出结果重定向至\code{POSCAR2}输出）
+
+\begin{extend}
+    除了“标准输入”和“标准输出”之外，Linux还有一个“标准错误输出”，用来输出命令运行报错的结果。例如，当我们希望删除一个名为\code{POSCUT}的文件时（该文件并不存在），使用\code{rm POSCUT}会报错（这一点在\ref{sec:文件操作}已经详细讨论过了）。如果试图将这一输出重定向，例如，\code{rm POSCUT > output}，效果是一样的。但如果使用\code{rm POSCUT 2> output}呢？你会发现，终端没有报错了，而将报错输出至文件\code{outcar}当中了。这其中，\code{2>}就表示将“标准错误输出”重定向至后面的文件。
+
+    在这一基础上，稍微扩展一下。在后面的VASP教程中，我们将看到提交脚本中有\code{mpirun vasp\_std > vasp.out 2>vasp.err}这一行\footnote{不同课题组可能有所不同，这里仅仅作为例子。}。暂且忽略掉前面的\code{mpirun}（表示分布式计算系统下并行运行任务），可以发现，这一行的作用就是运行\code{vasp\_std}，并将输出结果输出至\code{vasp.out}，而将错误信息输出至\code{vasp.err}。
+
+    另外，我们这里重定向的文件并不一定是文本文件。如果你回顾一下\ref{subsec:查看文件-Linux文件类型}一节，可能会发现里面有一个“设备文件”，它也是可以作为重定向输入输出的一部分。例如，\code{rm POSCUT 2> /dev/null}则表示将输出报错信息重定向至\code{/dev/null}设备（这是一个“空设备”，用于消除所输出的内容）。运行这一命令，你将不会得到任何输出结果（输出被消除了）
+\end{extend}
+
+
+\subsection{错误处理}\label{subsec:管道与重定向-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{使用\code{cat << POSCAR}没有反应}
+
+如果你确实希望使用输入重定向，应当注意是\code{<}（一个）而不是\code{<<}（两个）。后者在Linux中通常用于终端交互中，例如，上面的命令表示将\code{POSCAR}之间的内容作为输入。一个演示例子为：
+
+\begin{lstlisting}[language=bash]
+$ cat << POSCAR
+> hello
+> world
+> POSCAR
+hello
+world
+\end{lstlisting}
+
+可以看到，它把“POSCAR”之间的内容传入了\code{cat}命令（输出）
+
+

@@ -1,0 +1,79 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{sed文本替换}\label{sec:sed文本替换}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何使用\code{sed}命令对文本文件进行替换
+    \item 如何使用\code{sed}查看文件内容
+    \item 如何使用\code{sed}添加（删除）文本文件的内容
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+在\ref{sec:查找与替换}当中，已经介绍了如何使用vim进行文本文件的替换。与vi里面的\code{s}命令类似，在命令行也有类似的方式可以对文本文件进行替换（甚至更复杂的操作）。那就是使用\keyword{sed}命令。
+
+\subsection{使用\code{sed}显示}\label{subsec:sed文本替换-使用sed显示}
+
+\code{sed}的语法格式是：\code{sed [选项] "<动作>" [文件路径]}。其中，常见的选项包括
+
+\begin{itemize}
+    \item \keywordin{sed}{-n} 表示\emph{只有处理的文本}显示在屏幕上（默认是全部文本）
+    \item \keywordin{sed}{-i} 表示\emph{直接修改文件内容}。
+\end{itemize}
+
+\begin{attention}
+    在本节，我们所处理的文件都会使用\code{-i}选项直接对文件进行处理。但这一行为是危险的，尤其是对于不确定的修改操作，由于它是对原文件进行修改，因此需要提前备份。
+
+    在下一节将介绍管道运算符和重定向运算符，将会帮助你避免这一问题。
+\end{attention}
+
+\begin{extend}
+    如果你仔细观察上面的语法格式，需要特别注意的是里面的\code{[文件路径]}是“可选”的，也就是说，\emph{对于\code{sed}命令而言，可以不提供文件路径}。这件事可能会比较“难以置信”，毕竟如果没有文件，怎样处理文件呢？
+
+    事实上，\code{sed}命令是一个\emph{管道命令}，简单来说，它是可以读取并处理终端输出的内容。除此之外，像前面的\code{grep}也是类似的（虽然我们前面并没有特别强调这一点）。
+
+    在下一节，我们将详细讨论管道命令的内容。
+\end{extend}
+
+让我们先来看一个最简单的操作——\emph{打印}，即试着将特定几行的内容打印在屏幕上。其在“动作”部分的写法是\code{<开始行号>,<结束行号>p}。例如，我们希望将\code{POSCAR}的第3-5行输出，可以使用命令\code{sed -n "3,5p" POSCAR}表示输出第3-5行内容。
+
+\begin{extend}
+    如果你此时忘记了\code{-n}选项的话，命令将会输出所有的\code{POSCAR}文件，但对应行号的内容会重复输出。（可以试试）
+
+    另外，如果希望对最后一行进行操作，需要使用\code{\$}符号表示\emph{最后一行}，但此时\emph{需要将外面的双引号变为单引号}。通常情况下，双引号和单引号是等价的，但在涉及到\code{\$}符号时，使用双引号则表示将\code{\$}和后面的符号（例如\code{\$p}）解析成\emph{变量p}，而使用单引号则表明这一符号就是符号本身。变量的作用，将在后面循环和批量处理中体现，在此不做讨论。
+\end{extend}
+
+\subsection{使用\code{sed}添加和删除}\label{subsec:sed文本替换-使用sed添加和删除}
+
+使用\code{sed}命令删除某一行的方法是使用\code{d}，例如，如果希望删除\code{POSCAR}文件的第3-5行，类似于上面的显示，使用方法是\code{sed -n "3,5d" POSCAR}
+
+\begin{attention}
+    这一操作是对文件内容进行删除，因此你应该谨慎使用\code{-i}选项（会直接将原文件对应内容删除），在下一节的重定向运算符将会提供灵活的解决方法。目前的一个方法是\emph{创建一个备份文件}。
+\end{attention}
+
+对于添加某行内容，可以使用\code{a}或\code{i}，前者表示\emph{新增（在下一行）}，后者表示\emph{插入（在上一行）}。具体的，其命令为：\code{sed [选项] "行号a(i) 添加字符串" [文件名]}例如，希望在\code{POSCAR}的第一行后面添加一个字符串“1.0”，可以使用\code{sed -n "1a 1.0" POSCAR}。
+
+那么，如果希望在第一行添加内容，应当怎么办呢？
+
+\answer{\code{sed -n "1i 1.0" POSCAR}即可。}
+
+\subsection{使用\code{sed}替换}\label{subsec:sed文本替换-使用sed替换}
+
+使用\code{sed}替换有两种模式，分别是\emph{整行替换}和\emph{字符串替换}。对于整行替换，命令为\code{sed [选项] "行号c 替换目标字符串" [文件名]}。例如，若希望将\code{POSCAR}的第2行替换为“0.8”，则可以使用命令：\code{sed -n "2c 0.8" POSCAR}。
+
+相比于整行替换，字符串替换可能更为强大。与vim的替换类似，在\code{sed}当中替换字符串的命令是\code{sed [选项] "s/要被替换的字符串/新字符串/g"}。例如，希望在\code{INCAR}当中的\code{ENCUT=400}替换为\code{ENCUT=600}，可以使用命令\code{sed "s/ENCUT=400/ENCUT=600/g" INCAR}。
+
+对于字符串替换而言，更重要的是\emph{支持正则表达式}（关于正则表达式的内容详见\ref{sec:初窥正则表达式}一节），例如，在上面的例子中，我们希望将\code{ENCUT=400}或\code{ENCUT=600}全部替换为\code{ENCUT=800}，则可以使用\code{sed "s/ENCUT=$\backslash$ d$\backslash$ d$\backslash$ d/ENCUT=800/g" INCAR}
+
+\begin{attention}
+    同样，由于这是对内容的删除（更改），因此需要提前备份。除非有足够的把握，否则不要使用\code{-i}选项。
+\end{attention}
+
+
+\subsection{错误处理}\label{subsec:sed文本替换-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{sed: -e expression \#1, char 2: invalid usage of line address 0}
+
+在使用行号时，第一行是1而不是0. 通常来说，当你试图在第1行插入数据时，应当使用\code{sed -n "1i 字符串" [文件名]}，其中\code{i}表示在第1行前面插入数据（即在第一行写入字符串）
