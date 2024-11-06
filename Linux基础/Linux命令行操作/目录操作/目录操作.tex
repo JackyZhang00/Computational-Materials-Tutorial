@@ -123,6 +123,10 @@ drwxrwxr-x 2 zjq zjq 6 Aug 12 16:35 vasp
 
 表示\code{INCAR}是文件，而\code{vasp}和\code{python}是目录。如果执行了\code{cd INCAR}，则会报错。
 
+\subsubsection{-bash: cd: <目录名>: No such file or directory}
+
+这是因为你所要进入的目录不存在。请再次检查你所输入的目录是否正确。
+
 \subsubsection{-bash: cd: <目录名>: Permission denied}
 
 这表明你尝试进入一个你没有权限的目录。例如，在\code{/home}目录下，有\code{ljk}和\code{zjq}两个目录，分别表示两个用户。如果执行\code{ls -l}则会发现：
