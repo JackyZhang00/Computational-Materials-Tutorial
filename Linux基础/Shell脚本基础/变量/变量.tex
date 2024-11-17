@@ -1,0 +1,152 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{变量}\label{sec:变量}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何在脚本中定义变量
+    \item 如何输出变量
+    \item 如何对变量进行简单运算
+\end{Abstract}
+
+% 请在正文相应位置填写正确的小节标题（或小小节标题），同时将标签的“节标题”和“小节标题”改为实际内容
+
+如果所有脚本都只能按照固定的内容运行，显然功能太弱了。与其他编程语言类似，脚本语言应当也具有类似于“\emph{变量}”的功能实现“可拓展性”。
+
+所谓“变量”，指的就是\emph{在运行过程中会发生变化的量}，这些值可能是由用户输入给定的，或者在运行过程中生成的，或者是通过文件读取得到的。
+
+\subsection{定义变量与初始化}\label{subsec:变量-定义变量与初始化}
+
+与C语言等强类型语言不同，Shell脚本的变量在使用之前不需要对其进行“声明”，相对地则是需要对其进行\emph{初始化}。与其他编程语言类似，在Shell脚本中，第一次使用变量时需要对变量进行赋值（也可以叫做“初始化”）。例如，我们希望将字符串“Hello World!”赋值给一个变量，则可以使用\code{STRING="Hello World!"}
+
+\begin{attention}
+    与其他编程语言类似，在Shell脚本中，赋值也是使用\code{=}运算符。但不同的一点是，在运算符两侧\emph{不能有空格}。
+
+    在变量命名时，需要遵守如下原则：变量名只能包括数字、字母和下划线(\code{\_})，第一个字符不能是数字，不能是已有的关键字\footnote{“关键字”指的是在Shell脚本中已经具有特定含义的词语，如\code{echo}就不能作为变量名。}。
+\end{attention}
+
+在一个程序中，可以同时存在多个变量，对于已经赋值的变量，也可以对其再次进行赋值（原有值会发生变化）。例如，下面的代码：
+
+\begin{lstlisting}[language=bash,caption=variable,numbers=left]
+#! /bin/bash
+# 变量初始化
+STRING1="Hello World!"
+STRING2="I Like Bash"
+STRING2="I Like Shell Script"
+\end{lstlisting}
+
+上述代码第3行定义了一个变量\code{STRING1}，其赋值为\code{"Hello World!"}；在第4行，首先定义了一个变量叫做\code{STRING2}，首先赋值为\code{"I Like Bash"}，在第5行又一次对其进行赋值，此时\code{STRING2}的值变为\code{"I Like Shell Script"}。
+
+\subsection{调用变量}\label{subsec:变量-调用变量}
+
+如果你熟悉其他编程语言如C、Java、Python等，也许在编写上面的语句时，你会很自然写出如\code{STRING2=STRING1}这样的语句。在你看来，这好像是把\code{STRING1}的值赋值给\code{STRING2}，但当你运行时，发现事实并非如此。这是因为在Shell脚本中，变量的调用需要用到其他的方法。
+
+\begin{attention}
+    在上面我们提到\code{STRING2=STRING1}的含义是\emph{将\code{STRING1}的值赋值给\code{STRING2}}，这对于了解过其他编程语言的读者而言是很自然的。但如果你没有学习过其他编程语言，需要特别注意的一点是：在程序设计语言中（几乎大多数的程序语言），\code{=}所表示的含义与你所熟悉的数学上的含义不同。在数学上，=表示一种\emph{状态}，表达两个值相等；而在程序设计中，\code{=}表示将右边的值\emph{赋值给}左边的值（一种\emph{动作}）。
+
+    尽管在最后的结果上，二者是相同的，但数学上的=表达一种“状态”，而程序设计中表达一种“动作”，是不同的。一个很简单的例子就是上面的\code{STRING2=STRING1}，从数学的角度看，这显然不成立，因为\code{"I Like Shell Script"}显然不可能\emph{等于}\code{"Hello World!"}，但程序设计上是可行的，因为它表达了“赋值”的动作。
+
+    也正因如此，在数学上，$a$和$b$相等写成$a=b$或者$b=a$都是可行的（这也就是等式的“对称性”）；而对于程序设计而言，\code{a=b}和\code{b=a}显然是不同的，因为它们所表达的动作“方向”是不同的。
+\end{attention}
+
+在Shell脚本中，调用变量需要使用到\keyword{\$}符号。事实上，这不是你第一次见到它（如果你忘记了，请回到\ref{sec:简单for循环}一节，或者更准确的，\ref{subsec:简单for循环-关于变量}一节）。与定义变量不同，在Shell脚本中，但凡是需要\emph{调用变量}的地方，都需要使用\code{\$}符号。例如，在上面的例子中，如果你确实希望表达\code{STRING2=STRING1}，需要写作\code{STRING2=\$STRING1}。
+
+这里有一点“小绕”的地方在于，为什么在\code{STRING2}前面不需要添加\code{\$}符号。这是因为，我们实际上只是调用了\code{STRING1}变量的值，并不关心\code{STRING2}里面是\code{"I Like Shell Script"}还是\code{"I Like Roselia"}。因此，我们只需要通过\code{\$STRING1}来获得\code{STRING1}的值。
+
+\begin{extend}
+    你还可以做一个“不准确”的理解：\code{\$}总是视图将右边的内容“展开”为完整的内容。例如，假设\code{STRING2}的值为\code{"Hello World!"}，那么在调用\code{STRING2=\$STRING1}时，可以写作\code{STRING2="Hello World!"}（将变量\code{STRING1}展开）
+
+    对于前面所介绍的\code{for}循环，其本质是类似的。例如，\code{for i in \{1..5\}; do echo \$i; done}，实际上也是将变量\code{i}展开为具体的1到5.
+
+    当你了解这个时，对于后面的一些操作，会很有帮助。
+\end{extend}
+
+在了解了如何调用变量后，我们就可以做一些完整的事情了。例如，下面的一段完整代码实现了变量的初始化，修改赋值和调用，并在最后使用\code{echo}语句进行输出。
+
+\begin{lstlisting}[language=bash,caption=variable,numbers=left]
+#! /bin/bash
+# 变量初始化
+STRING1="Hello World!"
+STRING2="I Like Bash"
+# 修改变量的值
+STRING2="I Like Shell Script"
+# echo输出变量的值（调用变量）
+echo $STRING1
+echo $STRING2
+\end{lstlisting}
+
+运行上述代码，就可以看到输出了“Hello World!”和“I Like Shell Script”。
+
+\subsection{字符串中的\$符号}\label{subsec:变量-字符串中的$符号}
+
+像上面这样在字符串中使用\code{\$}符号，最简单的情况就是上面这种单纯输出一个变量。但大多数时候，我们可能希望在输出时提供更复杂的内容。例如，我们有下面的变量
+
+\begin{lstlisting}[language=bash,caption=dollar\_in\_string]
+#!/bin/bash
+# 初始化变量
+name="Jiaqi Z."
+band="Roselia"
+\end{lstlisting}
+
+如果我希望输出“My name is Jiaqi Z., and I like Roselia”。如果考虑到\code{echo}可以\emph{连续输出多个参数}，也许你会想写出\code{echo "My name is" \$name", and I like" \$band}这样的语句。确实，从运行的角度，这个句子没有任何问题。但显然从可读性的角度，稍显复杂。那么，有没有更简单，更清晰的方式呢？
+
+在使用\code{\$}表示变量时，我们可以将变量名使用大括号将其括起来。例如，上面的例子，我们就可以写作\code{echo "My name is \$\{name\}, and I like \$\{band\}"}
+
+\begin{extend}
+    如果你尝试将大括号去掉，在这一例子中，同样可以运行出正确的结果。这是因为，\emph{每一个变量名后面都跟着一个“标点符号”}。如果对于再一般的情况，我们的变量名后面跟着另外一些字母。例如，如果我们在\code{\$name}后面再加个s，对于使用大括号的情况，则会输出\code{Jiaqi Z.s}，而对于没有大括号的情况，则会输出错误的结果（由于没有变量叫做\code{names}）。
+
+    因此，为了更一般的情况，我们建议\emph{在使用变量名调用变量时加上大括号}。
+\end{extend}
+
+\subsection{变量简单运算}\label{subsec:变量-变量简单运算}
+
+在前面的例子中，我们都是针对于字符串变量进行讨论。事实上，变量还可以保存一些数值信息（例如整数、小数等）。例如，我们可以定义变量\code{a=3}和\code{b=2.5}。
+
+同时，在脚本中，我们也可以进行简单的四则运算。简单的方式则是利用\code{\$ (( 表达式 ))}的格式写出运算内容。例如，下面的代码则是简单计算1+1的结果：
+
+\begin{lstlisting}[language=bash,caption=calculate,numbers=left]
+#! /bin/bash
+# 定义变量
+a=1
+b=1
+# 计算
+c=$(( ${a} + ${b} ))
+# 输出
+echo ${c}
+\end{lstlisting}
+
+在Shell脚本中，四则运算（加减乘除）的符号分别为\code{+}, \code{-}, \code{*}, \code{/}，同时需要特别注意的两个符号是\code{\%}表示\emph{取余}，即\emph{求得两个整数相除后的余数}，例如，计算\code{echo \$(( 9\%4 ))}可以得到1；\code{**}（两个乘号）表示\emph{幂运算}，例如，\code{echo \$(( 2**10 ))}表示$2^{10}$，即1024.
+
+\begin{extend}
+    在Shell脚本中，你可以使用这种方法进行整数的四则运算。对于小数而言，则需要使用更复杂的方法。例如，对于变量\code{a=1.5}和\code{b=2}，如果希望做小数的四则运算，可以使用\keyword{bc}命令，写作\code{echo "\$\{a\} + \$\{b\}" | bc}。
+
+    但对于脚本来说，通常你不应寄希望于它的运算功能（这主要由于运算效率的限制）。通常来说，对于需要使用复杂运算的任务，应当考虑其他效率更高的编程语言如C语言\footnote{在大多数Linux当中都有C语言的编译器\code{gcc}，你可以使用\code{gcc --version}查看对应版本。}和Python语言。
+
+    例如，上述问题如果希望使用C语言编写，则可以写作下面的代码：
+
+    \begin{lstlisting}[language=C,caption=calculate.c,numbers=left]
+#include "stdio.h"
+int main()
+{
+    double a = 1.5;
+    int b = 2;
+    printf("%f\n",a+b);
+    return 0;
+}   
+    \end{lstlisting}
+    并通过\code{gcc calculate.c}的方式编译代码，得到\code{a.out}可执行文件。通过\code{./a.out}即可运行得到正确结果。
+
+    正因如此，在本教程中，我们不会详细讨论脚本的计算（如果你确实需要使用脚本进行复杂运算，请查阅其他相关资料（例如\code{bc}和\code{awk}的相关使用方法）
+\end{extend}
+
+\subsection{错误处理}\label{subsec:变量-错误处理}
+% 请在本节列出可能遇见的错误与解决方法
+
+\subsubsection{-bash: <表达式> : syntax error: invalid arithmetic operator (error token is "<表达式>")
+}
+
+这可能是由于你错误使用了四则运算符，例如，在使用\code{\$(())}的方式进行计算时，要求只能进行整数四则运算。如果你的运算符两边出现了小数，则会出现错误。
+
+\subsubsection{bash: <变量名>: command not found...}
+
+这是因为你在对变量进行赋值时，在\code{=}两边加了空格。在Shell脚本中，赋值符号(\code{=})两边不能有空格，这一点与其他编程语言不同。

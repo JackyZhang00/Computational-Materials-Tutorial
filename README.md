@@ -29,6 +29,7 @@ A repository for notes and resources related to our computational materials rese
   - Linux命令行操作
   - 文本编辑工具vi和vim
   - 高级Linux命令
+  - Shell脚本基础
 - VASP计算
   - 能带计算
   - 声子谱计算
