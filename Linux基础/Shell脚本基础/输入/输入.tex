@@ -1,0 +1,116 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{输入}\label{sec:输入}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何读取用户输入
+    \item 如何读取命令参数
+    \item 如何将命令执行结果赋值给变量
+\end{Abstract}
+
+在前面，我们仅仅讨论了脚本内定义的变量，这对于脚本而言远远不够。在实际使用脚本的时候，有一些信息只有在调用时才能知道。例如，如果我们希望编写一个可以删除文件的脚本\footnote{尽管我们已经有了\code{rm}命令，但我们可能还会有其他想法。例如，我们希望在删除完成后输出删除了哪些文件，或者我们希望将“删除”改为移动至某一个目录实现“回收站”的功能。}，在编写时不可能知道需要删除哪些文件。因此，有必要在写脚本时考虑实现“交互”。
+
+通常来说，交互的方式有三种：程序运行时输入、程序调用参数、以及外部文件。在本节，我们将讨论这三种交互方式如何在脚本中实现。
+
+\begin{attention}
+    严格来说，还有一种：管道输入。在本节我们不详细讨论管道的输入方式。
+\end{attention}
+
+\subsection{用户输入}\label{subsec:输入-用户输入}
+
+在Shell脚本中，实现用户输入的方法是使用\keyword{read}语句。一般格式是\code{read <变量名>}，例如，\code{read a}表示在运行时读取用户输入，并将输入结果赋值给变量\code{a}。
+
+在调用\code{read}命令时，可以提供一个选项，\keywordin{read}{-p}表示在屏幕上显示提示信息，其格式为\code{read -p <提示信息> <变量名>}。
+
+利用这一命令，我们可以实现简单的交互。例如，我们可以写一个简单的“应声虫”小程序，即当用户输入一个内容后，程序原封不动将其输出。
+
+\begin{lstlisting}[language=bash,caption=my\_echo,numbers=left]
+#!/bin/bash
+# 读取输入
+read -p "Please input a string: " STRING
+# 输出
+echo "You said: ${STRING}."
+echo "Good Luck!"
+\end{lstlisting}
+
+其中，第3行我们使用\code{read}命令读取用户输入，并将其赋值给\code{STRING}。之后在第5行使用\code{echo}语句输出了用户的内容（在前面加了一些其他内容）。
+
+在运行时，程序会首先输出\code{Please input a string: }并等待用户输入。当用户输入完毕后，按下回车表示完成，此时程序执行后面的内容（输出）。
+
+\begin{attention}
+    在读取输入时，不要在变量名前面“画蛇添足”加上一个\code{\$}符号。如果你试着这样做，会得到错误的结果——它有可能会输出空白信息，或者输出一些其他的内容。
+\end{attention}
+
+\begin{extend}
+    输出空白或者其他信息取决于你的运行方式是使用\code{source}还是添加执行权限。对于前者，\code{source}本质上相当于在当前Shell终端下执行了脚本里的命令，其变量会延续到脚本外。因此，如果你在刚开始正确时输入了一个内容，如“Hello World!”，脚本会将其赋值给\code{STRING}变量并延续到Shell外部（用更专业的说法，这种“延续”实际上是“作用域”的体现）。此时如果你尝试在外面直接运行\code{echo \$STRING}，也会得到对应的结果。
+
+    如果你是添加了执行权限并运行的话，脚本实际上是在当前Shell下新建了一个“子Shell”并运行，运行过程中产生的变量仅会在这一Shell内有效（表现为程序内），当退出脚本时，变量也就因此失效了。
+
+    在使用\code{read}输入变量时，如果后面加了\code{\$}符号，则不会输入任何内容。此时在\code{echo \$STRING}时，则会根据目前环境下已有的变量，输出对应的结果（已有的内容或空白）
+\end{extend}
+
+\subsection{参数输入}\label{subsec:输入-参数输入}
+
+除了使用前面所介绍的\code{read}方法在程序运行时读取用户输入，在有些时候可能也希望通过类似于参数调用的方式输入。可以类比一下最开始我们所接触到的如\code{cd}和\code{rm}，在切换目录或者删除文件时，都是在调用时直接给出对应的文件名，而不是在运行过程当中输入。那我们有没有类似的方法实现这一功能？
+
+答案肯定是有的，而且这一部分你不需要任何特殊的命令。因为在脚本中，如果调用时提供了一个参数，默认在程序中就是\code{\$1}，以此类推，如果有两个或多个参数，则分别是\code{\$2, \$3, \$4}等等。例如，下面的代码则实现了位置参数的调用：
+
+\begin{lstlisting}[language=bash,caption=loc\_parameters,numbers=left]
+#!/bin/bash
+# 输出第一个参数
+echo "First parameter is ${1}"
+# 输出第二个参数
+echo "Second parameter is ${2}"
+\end{lstlisting}
+
+当调用时，类似于之前使用其他内置命令那样，可以往其中传递参数（使用空格分割），如\code{./loc\_parameters hello world}，则第一个参数为“hello”，第二个参数为“world”。
+
+\begin{attention}
+    通常来说，我们将这种形式上如\code{\$n}的参数叫做\emph{位置参数}。也请务必注意的一点是：位置参数默认是从1开始而不是从0开始的。当参数数量在9个及以内时，可以直接使用\code{\$1}到\code{\$9}这种形式，但如果到了10个及以上参数，需要在数字外面加大括号如\code{\${10}}。
+
+    你也可以尝试在程序中使用\code{\$0}，它表示\emph{正在运行的脚本名称}。
+\end{attention}
+
+\begin{extend}
+    如果你真的尝试输出\code{\$0}的值，可能会意外地输出一个叫做\code{-bash}的内容而不是脚本名称。这是因为如果你使用的是\code{source}方式运行，在这种情况下，你的脚本实际上是在当前命令行环境下运行，此时程序中的\code{\$0}与你直接在命令行中输入\code{\$0}运行结果应当是一致的。
+
+    另外，如果你的程序是在其他目录下运行（假设你已经将这一目录添加进环境变量），此时\code{\$0}会输出这一脚本所在的完整目录。
+\end{extend}
+
+除了直接使用位置编号表示参数本身外，Bash脚本还提供其他内置的参数表示其他信息。常见的例如\code{\$\#}表示传递的参数个数（不包括\code{\$0}），\code{\$\@}表示整个参数列表。下面的程序使用\code{for}循环遍历了所有参数（完整的\code{for}循环教程在后面介绍）
+
+\begin{lstlisting}[language=bash,caption=special\_parameters,numbers=left]
+#!/bin/bash
+# 输出一些特殊参数
+echo "Current file is ${0}"
+echo "We have $# parameters"
+echo "They are:"
+for i in $@ 
+do
+    echo $i
+done
+\end{lstlisting}
+
+其中，第6行使用\code{\$\@}符号表示传入的参数列表，并对其中的所有元素进行遍历（输出）
+
+\subsection{读取命令作为输入}\label{subsec:输入-读取命令作为输入}
+
+除了在运行时输入，在很多时候我们需要借助于一些命令读取文件的内容，并将其作为变量进行处理。例如，我们希望读取\code{INCAR}文件中的\code{ENCUT}所在的一行，根据前面所学习的方法，我们可以使用\code{grep}命令，如\code{grep ENCUT INCAR}命令来输出这一行。如果我们希望将这一命令作为变量输入到脚本中，只需要使用\code{\$(grep ENCUT INCAR)}这种形式即可，其命令使用小括号，且前面加上变量的\code{\$}符号。同样，在命令里面也可以使用变量以实现更复杂的交互功能，下面的代码实现了\emph{用户输入一个字符串和文件名，查找文件中包含这一字符串所在一行的内容}：
+
+\begin{lstlisting}[language=bash,caption=print\_string,numbers=left]
+#!/bin/bash
+# 读取字符串
+read -p "Please input a string: " STRING
+# 读取文件名
+read -p "Please input a file name: " FILE
+# 读取命令并赋值
+result=$(grep ${STRING} ${FILE})
+echo ${result}
+\end{lstlisting}
+
+\begin{attention}
+    上述代码并不是一个“完美”的代码，因为在读取文件时，并没有对文件是否存在进行检查。因此，如果输入了一个不存在的文件名，则会输出错误的结果（如同你正常使用\code{grep}时输入了错误的文件名那样报错）。当你测试这一段代码时，请提前创建好一个对应的文件。
+
+    在后面的学习中，我们将进一步完善这一代码（设置一段代码实现文件是否存在的检查）
+\end{attention}
