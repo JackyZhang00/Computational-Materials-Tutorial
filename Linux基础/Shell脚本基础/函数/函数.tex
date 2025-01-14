@@ -1,0 +1,128 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{*函数}\label{sec:函数}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何定义与调用函数
+    \item 函数参数
+    \item 函数返回值
+\end{Abstract}
+
+前面我们已经学习了程序的基本结构——顺序语句、条件语句和循环语句。此时，应当已经足够完成大多数脚本程序的编写。在本节和下一节，我们将介绍一些扩展性的内容——函数和数组。这两部分可以帮助你更快、更方便地编写程序。
+
+\subsection{定义函数}\label{subsec:函数-定义函数}
+
+在bash脚本中，函数的定义必须在调用之前。这是因为脚本语言是按照顺序执行的，如果在程序不知道的情况下直接调用，那必然会报错。在bash脚本中，对一个函数定义的基本格式为：
+
+\begin{lstlisting}[language=bash]
+[function] function_name()
+{
+    函数体;
+    [return int.;]
+}
+\end{lstlisting}
+
+在定义时，可以在前面加上\code{function}以示区分，也可以不加直接以函数名作为开始。在函数内部的语句块使用大括号括起来（函数体），在函数的结束可以使用\code{return}语句返回一个范围在0-255之间的整数。
+
+\begin{attention}
+    与大多数程序语言不一样，bash脚本对函数返回类型有明确的数值要求，且这个要求是不随程序员所改变的。如果要返回函数运行结果是否成功，可以使用\code{return}语句，但如果返回的是其他内容（例如返回两个数字相乘的结果），则可以使用字符串的形式返回。
+
+    在bash的函数定义中，我们不会在函数开始的地方强调参数的个数和类型（这点与C语言等类似语言不同），具体的参数将在函数体内部使用\code{\${num}}的形式体现（与\ref{subsec:输入-参数输入}所介绍的参数类似）
+\end{attention}
+
+例如，下面的程序简单定义了一个名字叫做\code{my\_echo}的函数：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={my\_echo\_function}]
+#!/bin/bash
+# 定义函数
+my_echo()
+{
+    echo "Hello"
+}
+\end{lstlisting}
+
+这个函数内部只有一个输出语句，且没有返回值。
+
+\begin{extend}
+    我们这里所说的“没有返回值”，特别指的是不使用\code{return}返回的返回值。你也完全可以将这个函数的\code{echo}输出看作是一个字符串返回。
+\end{extend}
+
+\subsubsection{有参数函数的调用}
+
+与\ref{subsec:输入-参数输入}一节所介绍的方法类似，在函数内部我们也可以使用\code{\$1}表示第一个参数，当参数个数大于等于10时，则需要使用大括号将数字括起来，例如，\code{\$\{10\}}表示第10个参数。
+
+在函数体内部，我们也可以使用\code{\$\#}表示参数的个数（与前面所介绍的方法一样），可以使用\code{\$\*}将所有参数以字符串的方式输出。例如，下面的程序就实现了两个整数相加的计算函数：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={add\_function}]
+#!/bin/bash
+# 两个整数相加
+function add_function() {
+    c=$(( $1 + $2 ))
+    echo $c
+}
+\end{lstlisting}
+
+这里的第4行我们使用\code{\$1}和\code{\$2}分别表示第1个参数和第2个参数，并将计算结果赋值给变量\code{c}，并在最后输出变量\code{c}的值。
+
+在这里请思考一下：为什么我们的程序使用\code{echo}语句输出返回值，而不是使用\code{return}语句返回结果？
+
+\answer{因为两个数字相加的结果可能超过255。}
+
+
+\subsection{函数调用}\label{subsec:函数-函数调用}
+
+在定义函数的基础上，调用函数就可以将函数看作是一个新的\emph{命令}使用了。例如，对于我们定义的\code{my\_echo}函数，在程序内就可以直接使用\code{my\_echo}命令调用这个函数，从而输出“Hello”。
+
+对于下面的\code{add\_function}函数，类似于前面在介绍命令行传递参数一样，我们也可以使用类似的方式调用这个函数。下面的代码则完整展示了函数定义与调用的全过程：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={add\_function}]
+#!/bin/bash
+# 两个整数相加
+function add_function() {
+    c=$(( $1 + $2 ))
+    echo $c
+}
+result=$(add_function 200 300)
+echo ${result}
+\end{lstlisting}
+
+我们在第7行使用了一个赋值语句特别说明了\emph{如何将函数\code{echo}的返回值作为一般的返回值处理}，也可以看到，对于这个例子，当计算200+300时，程序可以给出正确的结果（500）。
+
+在一般使用时，我们也可以直接省略掉后面两行，而直接使用\code{add\_function 200 300}也能输出类似的结果，当然，本例所给的方式更具有可扩展性。例如，你可以对这个结果进行进一步的计算，例如判断它是否大于255.（请试着完成这段代码）
+
+最后，让我们再稍微扩展一下，如果用户在最开始给定一个数字个数，使用上面的函数，实现多个整数相加的结果。例如，用户一开始输入5表示有5个整数进行相加，然后会依次输入5个整数，程序输出5个数字相加的结果。我们在这里给出最终答案，请试着理解这段代码，并在理解后尝试自己写出来实现相同的效果：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={add\_function2}]
+#!/bin/bash
+# 多个整数相加
+function add_function() {
+    c=$(( $1 + $2 ))
+    echo $c
+}
+
+read -p "Please input a number" count
+index=1
+a=0
+while [ $index -le $count ]
+do
+    read b
+    result=$(add_function $a $b)
+    a=$result
+    ((index++))
+done
+echo $result
+\end{lstlisting}
+
+在分析这段代码时，请务必考虑的内容是：\code{while}内部的循环条件为什么是这样（如果写成\code{-lt}会发生什么）；为什么第15行要有一句\code{a=\$result}，它的作用是什么？在整个程序中，\code{index}变量的作用是什么，为什么它的初始值设置为1；同时，为什么在开始时\code{a}有一个初始为0的值？
+
+当你想明白这些答案时，相信这段代码就没有难度了。当然，我们这里是逐一计算的，那有没有办法在存下多个数据后一次性计算呢？这里的难点在于如何存储多个数据，这就需要下一节\emph{数组}相关的内容了。
+
+% \subsection{错误处理}\label{subsec:节标题-错误处理}
+% % 请在本节列出可能遇见的错误与解决方法
+
+% \subsubsection{错误1}
+
+% \subsubsection{错误2}
+
+% \subsubsection{错误3}
