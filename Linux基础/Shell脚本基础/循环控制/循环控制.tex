@@ -1,0 +1,126 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{循环控制}\label{sec:循环控制}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何使用\code{break}语句
+    \item 如何使用\code{continue}语句
+\end{Abstract}
+
+在\ref{sec:循环}一节中，我们曾简单提到了“死循环”问题。在当时看来，死循环是一个应当避免的“错误”，但事实可能不总是如此——在有些情况下，我们可能不得不希望使用死循环。例如，我们希望一直读取用户的输入，直到用户输入0时退出。此时当然可以使用\code{while}循环或者\code{until}循环来解决这一问题。但还有一种思路——设计一个死循环，当用户输入0时跳出循环。
+
+\begin{extend}
+    在其他领域，死循环可能是更常见的。例如，在一些单片机系统中，会使用死循环来执行对应的任务，例如读取传感器数据、显示处理数据等；而在Windows操作系统中，任何一个窗口在创建时都会启动叫做“消息循环”的死循环来保持窗口——对于Windows来说，如果没有这个死循环，窗口会立即关闭。
+
+    因此，在程序中，死循环并不是“绝对的错误”，而要根据需要选择。一些可控的、必需的死循环也是程序所必要的一部分。
+\end{extend}
+
+回到最开始的例子，在bash语言中，我们有两种方式对循环语句进行控制——\code{break}语句和\code{continue}语句。其中前者表示“终止循环”，而后者表示“继续循环”
+
+
+
+\subsection{使用\code{break}停止循环}\label{subsec:循环控制-使用break停止循环}
+
+\begin{extend}
+    本节所要介绍的\code{break}与\code{continue}，在使用方式与效果上与C语言的\code{break}和\code{continue}\emph{完全相同}。因此，如果你足够熟悉C语言，本节完全可以跳过。但我们还是建议你通过阅读这一节复习一下相关的内容。
+\end{extend}
+
+\code{break}语句的作用是用来\emph{跳出循环}，例如，下面的程序，用户输入一系列数字，当用户输入0时，循环结束，输出“end”
+
+\begin{lstlisting}[language=bash,numbers=left,caption={break\_example}]
+#!/bin/bash
+# break跳出循环
+read a
+while [ true ]
+do
+    if [ $a -eq 0 ]; then
+        break
+    fi
+    echo $a
+    read a
+done
+echo "end"
+\end{lstlisting}
+
+在第4行，我们设置了一个条件\code{true}，使循环条件始终成立，从而令其成为一个“死循环”。在第6行利用\code{if}语句判断输入的变量是否为0，如果是0，则通过\code{break}跳出循环，执行最后一行的“end”输出。如果输入的数字不为0，则输出对应的变量值。
+
+\begin{attention}
+    请务必仔细思考一下，程序的第10行又写了一句\code{read a}有什么作用？如果没有这句命令会发生什么？在程序中有两句\code{read}命令稍显繁琐，有没有简单的方法使用一句即可实现相同的功能？
+\end{attention}
+
+除了在\code{while}循环外，\code{for}循环和\code{until}循环也可以使用\code{break}语句。例如，下面的程序遍历了10-20之间所有的数字，且当数字为7的倍数时停止。
+
+\begin{lstlisting}[language=bash,numbers=left,caption={break\_example2}]
+#!/bin/bash
+# 在for循环中使用break语句
+# 当遍历到7的倍数时停止
+for i in {10..20}
+do
+    if [ $(( $i%7 )) -eq 0 ]; then
+        break
+    fi
+    echo $i
+done
+echo "end" 
+\end{lstlisting}
+
+其中，变量\code{i}会依次从10递增到20，当\code{i}取值为14时，满足7的倍数\footnote{这里使用常见的方法——“取余”判断倍数，具体的计算方法可以查看\ref{subsec:变量-变量简单运算}一节。}，从而进入条件判断内，执行\code{break}命令，跳出循环输出\code{end}
+
+\begin{attention}
+    上面的两个例子还说明了，\code{break}跳出循环是“立刻跳出”，即如果循环体内有剩下的其他语句也不会执行了。例如，上面的判断倍数的例子，当\code{i}取值为14时，也没有输出这个值（因为输出命令在\code{break}后面。
+
+    可以尝试一下：如果将\code{echo \$i}放在循环体内第一行，输出结果会有什么不同？
+\end{attention}
+
+\subsection{使用\code{continue}跳过循环}\label{subsec:循环控制-使用continue跳过循环}
+
+与C语言类似，在bash脚本中，也可以使用\code{continue}跳过循环。这里所说的“跳过”，指的是\emph{跳过当前轮次的循环}。让我们直接来看一个例子——假设将上面判断7的倍数的例子中的\code{break}改成\code{continue}，看看会发生什么。
+
+\begin{lstlisting}[language=bash,numbers=left,caption={continue\_example2}]
+#!/bin/bash
+# 使用continue语句跳过循环
+for i in {10..20}
+do
+    if [ $(( $i%7 )) -eq 0 ]; then
+        continue
+    fi
+    echo $i
+done
+echo "end" 
+\end{lstlisting}
+
+运行后可以看见，程序输出了10-20的所有数字，除了14。这是因为当变量\code{i}为14时，条件满足，执行\code{continue}语句，跳过了当前轮次的循环，直接进入下一个循环轮。与\code{break}类似，这里也不再执行后面的语句（即不会输出14这个数字）
+
+虽然\code{continue}在语法上和\code{break}类似，难度也不大，但其使用时存在一个非常潜在的“隐患”。让我们再来看一下本节最开始的程序，如果将其中的\code{break}改成\code{continue}，会发生什么？此时代码长成下面这样：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={continue\_example}]
+#!/bin/bash
+# 使用continue跳过0的判断，继续输入？
+read a
+while [ true ]
+do
+    if [ $a -eq 0 ]; then
+        continue
+    fi
+    echo $a
+    read a
+done
+echo "end"
+\end{lstlisting}
+
+一些“粗心大意”的人可能会认为：这段代码一直读取用户的输入并输出对应的内容，当用户输入0时跳过输出。让我们执行一下这段代码，当用户输入非0的数字时，程序很正常地输出对应的数字；当用户输入0时，程序也确实跳过了0的输出；但是，\emph{从这开始程序再也读取不了输入了}。从程序代码的执行过程可以很容易理解这一点，当用户输入0时，此时变量\code{a}的值为0，进入条件判断内，跳过当前循环。正如前面所说的那样，程序跳过循环\emph{不再执行后面的语句}。因此，在后面的循环中变量\code{a}始终保持0的值，即始终在4-7行语句间循环。
+
+\begin{attention}
+    对于\code{for}循环而言，由于它是对序列进行遍历，一般情况下总是“有限”的，因此循环总是能停止的。而对于\code{while}和\code{until}循环而言，在循环开始和\code{continue}中间，\emph{要有改变循环条件或者终止循环的语句}，否则循环将陷入“死循环”。
+\end{attention}
+
+
+% \subsection{错误处理}\label{subsec:节标题-错误处理}
+% % 请在本节列出可能遇见的错误与解决方法
+
+% \subsubsection{错误1}
+
+% \subsubsection{错误2}
+
+% \subsubsection{错误3}
