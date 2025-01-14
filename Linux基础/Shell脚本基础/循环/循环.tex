@@ -1,0 +1,169 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{循环}\label{sec:循环}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何使用\code{for}循环
+    \item 如何使用\code{while}循环
+    \item 如何使用\code{until}循环
+    \item \code{while}循环和\code{until}循环的区别
+\end{Abstract}
+
+在前面介绍高级Linux命令时，我们曾说过脚本处理的任务大多是\emph{批量处理}任务，而批量处理的一个基本方法就是使用循环语句（毕竟没有人会想写上上百行相同的代码）。在\ref{sec:简单for循环}一节中，我们介绍过\code{for}循环的使用，当时是在命令行中编写的。本节我们将首先复习一下\code{for}循环的基本使用方法，以及它在脚本程序中的格式（和命令行类似），然后再介绍两种不同的循环语句——\code{while}循环和\code{until}循环——它们虽然在一定程度上是等价的，但在不同的情况下，选择合适的循环语句会让程序更加简洁易读。
+
+\subsection{\code{for}循环}\label{subsec:循环-for循环}
+
+下面的代码完整演示了常见的三种\code{for}循环格式：
+
+\begin{lstlisting}[language=bash,numbers=left,caption={for\_example}]
+#!/bin/bash
+# 使用for循环输出
+# 简单列表
+for i in 1 2
+do
+    echo $i
+done
+echo ""
+# 生成列表
+for i in $(seq 1 2 10)
+do
+    echo $i
+done
+echo ""
+# 使用C语言格式
+for ((i=0;i<10;i++))
+do
+    echo $i
+done
+\end{lstlisting}
+
+其中第8行、第14行使用\code{echo ""}输出一个空行用来区分不同的输出结果。
+
+\subsubsection{简单列表}
+
+使用基本列表的格式调用\code{for}循环的基本格式为：
+
+\begin{lstlisting}[language=bash]
+for <变量名> in <列表>
+do
+    循环体
+done
+\end{lstlisting}
+
+\begin{extend}
+    在循环语句内部的语句，我们常常称其为\emph{循环体}（实际上和前面所说的\code{commands}，程序块，语句块等一样）
+\end{extend}
+
+在这里的\code{<列表>}可以如同上面的代码一样直接以空格分隔表示，也可以与\ref{sec:简单for循环}一节所说的那样使用大括号将其括起来，并用逗号分割。
+
+\begin{attention}
+    一个常见的错误是将两者混淆，即\emph{使用大括号表示列表的同时，其内部元素用空格分隔}。可以验证的是，这并不会如你所愿得到正确的信息。事实上，空格的“优先级”会高于大括号的“优先级”（这里加引号表示这不是传统意义上运算符的优先级），当括号和空格同时存在时，程序会将列表解析为\emph{以空格分隔的列表}，从而在输出的前后（第一个元素和最后一个元素）带有大括号。
+\end{attention}
+
+与前面的介绍类似，在循环体内使用变量需要加\code{\$}符号。
+
+\subsubsection{生成列表}
+
+与\ref{sec:简单for循环}里所介绍的方法类似，可以使用\code{seq}命令生成序列。与前面所介绍的方法不同的是，前面所使用的是\code{`}符号括起来的命令，而在脚本中，由于将\code{seq}看作是一个命令，因此与前面\ref{subsec:输入-读取命令作为输入}一节所介绍的输入方式类似，使用\code{\$()}的方式得到\code{seq}命令的结果，并将其作为一个变量传递给\code{for}循环。
+
+当然，也可以使用前面所说的\code{..}的方式生成序列。但需要复习的是：对于\code{seq}语句而言，三个参数分别是\emph{开始、步长、结束}；而对\code{..}方式而言，三个参数分别是\emph{开始、结束、步长}。因此，上面代码的\code{seq 1 2 10}也可以写作\code{\{1..10..2\}}
+
+\subsubsection{运算格式生成}
+
+如果你熟悉C语言的话，这一种格式会显得很“亲切”。因为它的基本结构与C语言几乎完全类似，类似地写法，如果让我们用C语言实现上面代码的第3部分，则可以写作这样：
+
+\begin{lstlisting}[language=C,numbers=left]
+#include <stdio.h>
+void main()
+{
+    for (int i=0;i<10;i++)
+        printf("%d\n",i);
+}
+\end{lstlisting}
+
+可以看到，相比于C语言，脚本只是一个括号和两个括号的区别\footnote{由于C语言是强类型语言，因此在for循环条件中定义了变量类型\code{int}，但这不是必需的，因为完全可以将变量定义放在循环外面作为单独的语句，此时C语言的括号内与脚本的括号内就完全相同了。在比较二者不同时，我们有意忽略了这一点，只是为了让大家关注到本质}。
+
+\begin{attention}
+    在脚本的\code{for}循环当中，括号前面没有\code{\$}符号，也千万不要“画蛇添足”加上这个符号。
+\end{attention}
+
+
+
+\subsection{\code{while}循环}\label{subsec:循环-while循环}
+
+与C语言的\code{while}循环类似，在bash脚本中也存在根据条件判断循环与否的\code{while}循环。其基本格式如下：
+
+\begin{lstlisting}[language=bash]
+while [ condition ]
+do
+    循环体
+done
+\end{lstlisting}
+
+其中，\code{condition}表示\emph{循环进行的条件}，其格式与\ref{sec:判断语句}当中所介绍的条件表达式类似。例如，下面的代码实现了从0到9的输出
+
+\begin{lstlisting}[language=bash,numbers=left,caption={while\_example}]
+#!/bin/bash
+# 使用while循环输出数字
+i=0
+while [ $i -lt 10 ]
+do
+    echo $i
+    ((i++))
+done
+\end{lstlisting}
+
+可以复习一下，条件\code{-lt}表示\emph{小于}，因此，循环体进行的条件是\emph{变量\code{i}小于10}。当条件满足时，程序进行循环体（\code{do}和\code{done}中间的部分）。因此，程序会从0开始，逐渐输出并加1，直到条件不满足时（\code{i}为10）则停止循环。
+
+\begin{attention}
+    与\code{for}循环相比，\code{while}循环更有可能写出“死循环”语句。所谓“死循环”，指的是程序在循环体内一直循环，永无停止。在上面的代码中，如果少了那句\code{((i++))}，则变量始终为0，条件始终满足，从而无法停止。
+
+    具体的解决方法，可以见下一节所介绍的\code{break}和\code{continue}语句。
+\end{attention}
+
+此外，在上面程序的第7行，使用\code{((i++))}表示进行计算，这是比较简洁的C风格递增运算符，类似的还有递减运算符\code{--}。这种方式的使用需要以两个括号括起来。你也可以使用\ref{sec:变量}一节所介绍的方法，使用\code{i=\$(( \$i + 1 ))}的方式。这二者在这一功能上是等价的。
+
+\subsection{\code{until}循环}\label{subsec:循环-until循环}
+
+与\code{while}循环几乎完全类似，bash脚本中\code{until}循环的格式为：
+
+\begin{lstlisting}[language=bash]
+until [ condition ]
+do
+    循环体
+done
+\end{lstlisting}
+
+与上面的\code{while}循环格式比较可以发现，除了关键字从\code{while}变成了\code{until}外，其他语句在格式上没有任何不同。但\code{until}循环的最大特点是：\emph{循环体执行的条件是\code{condition}为假}，即你可以简单的将其理解为：循环体会一直执行，“直到”（until）条件为真。
+
+\begin{attention}
+    这一点稍微有点绕，但上面的两种表述是“等价”的。对\code{while}循环而言，当条件为真时执行循环体，而对\code{until}循环而言，当条件为真时退出循环（当条件为假时进入循环）
+\end{attention}
+
+\begin{extend}
+    在C语言中，确实没有类似的循环与其对应，但我们可以从其他一些编程语言中找到这个例子，一个最简单的例子就是——Visual Basic语言（简称VB语言）。在VB语言中，也存在类似的\code{until}循环，其格式为：
+
+    \begin{lstlisting}
+Do 
+    循环体
+Loop Until 条件
+    \end{lstlisting}
+
+    如果你熟悉VB语言的话，bash脚本的\code{until}循环与VB语言的\code{until}循环最大的不同在于\emph{VB语言的条件是放在循环后面（类似于C语言的\code{do-while}循环）}
+
+    当然，如果你不熟悉VB语言的话，也不必担心。这一部分仅仅是对那些熟悉VB语言的读者所准备的，以防他们混淆条件的位置。如果你本来不了解VB语言的话，这一部分完全可以跳过。
+\end{extend}
+
+可以简单想见的是，\code{while}循环和\code{until}循环之间的转换仅仅是“\emph{条件的取反}”，例如，上面关于\code{while}循环的例子，我们只需要将里面的条件\code{\$i -lt 10}改为\code{\$i -ge 10}，同时将\code{while}改为\code{until}就可以实现相同的功能。这一部分代码我们不做演示，请自己尝试修改上面的代码并测试其输出结果是否与之前的结果一致。
+
+
+
+% \subsection{错误处理}\label{subsec:节标题-错误处理}
+% % 请在本节列出可能遇见的错误与解决方法
+
+% \subsubsection{错误1}
+
+% \subsubsection{错误2}
+
+% \subsubsection{错误3}
