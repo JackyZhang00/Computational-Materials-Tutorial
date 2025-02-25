@@ -34,6 +34,7 @@ A repository for notes and resources related to our computational materials rese
   - 能带计算
   - 声子谱计算
 - Python与机器学习
+  - 基础Python语法
 
 ## 如何为本教程做出贡献
 
