@@ -1,0 +1,81 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{固定某些原子的优化}\label{sec:固定某些原子的优化}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何在优化过程中固定某些原子
+\end{Abstract}
+
+在对某些结构进行优化时，我们可能希望仅优化个别原子以加速优化过程。例如，对于气体吸附的过程，在没有确定最终吸附位置时，我们可能会希望先只优化气体分子的位置而将下方的衬底作为“背景”固定，从而找到一个近似合理的位置。在本节，我们将讨论这一类问题的实现方法。
+
+\subsection{如何固定原子坐标}\label{subsec:固定某些原子的优化-如何固定原子坐标}
+
+无论是\code{ISIF=2}或者\code{ISIF=3}，优化过程都包括对原子坐标的优化。如果希望固定某个原子的坐标，则需要按照如下步骤操作：
+
+\begin{enumerate}
+    \item 在\code{POSCAR}的原子个数下面一行添加\code{Selective dynamics}（只要保证首字母为S或s即可）；
+    \item 在下方每个原子坐标后面使用三个逻辑值（\code{T}或\code{F}）表示是否对这一坐标分量优化（或固定）（中间使用空格分隔）
+\end{enumerate}
+
+还是以前面\ref{sec:对坐标进行优化ISIF=2}一节中关于\ch{O2}分子的优化例子，如果我们希望固定某一个氧原子，而让另一个氧原子只在$z$方向优化，则可以将\code{POSCAR}写成下面的样子：
+
+\begin{lstlisting}[caption=POSCAR,numbers=left]
+O2
+1.0
+5.0 0.0 0.0
+0.0 5.0 0.0
+0.0 0.0 5.0
+O
+2
+Selective dynamics
+Cartesian
+0 0 0 F F F
+0 0 1.2075 F F T
+\end{lstlisting}
+
+其中，第10行使用三个\code{F}表示三个坐标分量\emph{均不进行优化}，第111行使用\code{F}和\code{T}表示$x$和$y$坐标分量\emph{均不进行优化}，而仅优化$z$坐标分量\emph{优化}。
+
+使用的\code{INCAR}和\code{KPOINTS}与\ref{sec:对坐标进行优化ISIF=2}相同，这里仅列举如下而不做解释（方便读者直接阅读本节）：
+
+\begin{lstlisting}[caption=INCAR]
+ENCUT  =  600
+LWAVE  = .FALSE.
+LCHARG = .FALSE.
+PREC   = Accurate
+NSW    =  300
+ISMEAR =  0
+SIGMA  =  0.05
+IBRION =  2
+ISIF   =  2
+EDIFFG = -0.01
+\end{lstlisting}
+
+\begin{lstlisting}[caption=KPOINTS]
+K-Spacing Value to Generate K-Mesh: 0.000
+0
+Gamma
+    1   1   1
+0.0  0.0  0.0
+\end{lstlisting}
+
+优化得到的\code{CONTCAR}如下：
+
+\begin{lstlisting}[caption=CONTCAR]
+O2                                      
+1.00000000000000     
+    5.0000000000000000    0.0000000000000000    0.0000000000000000
+    0.0000000000000000    5.0000000000000000    0.0000000000000000
+    0.0000000000000000    0.0000000000000000    5.0000000000000000
+O 
+    2
+Selective dynamics
+Direct
+0.0000000000000000  0.0000000000000000  0.0000000000000000   F   F   F
+0.0000000000000000  0.0000000000000000  0.2476911285012822   F   F   T
+
+0.00000000E+00  0.00000000E+00  0.00000000E+00
+0.00000000E+00  0.00000000E+00  0.00000000E+00
+\end{lstlisting}
+
+其中，氧原子的键长变为1.2385 Å，与之前所优化得到的键长（1.23828 Å）接近。同时需要特别注意的是：优化后第一个原子\emph{仍然在原点位置}，而第二个原子\emph{仅$z$坐标发生变化}，从而实现了\emph{固定某些原子坐标}的目的。
