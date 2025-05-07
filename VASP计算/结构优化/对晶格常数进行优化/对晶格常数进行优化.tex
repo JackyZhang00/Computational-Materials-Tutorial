@@ -1,0 +1,161 @@
+% 请在下方的大括号相应位置填写正确的节标题和标签，以及作者姓名
+\section{对晶格常数进行优化\code{ISIF=3}}\label{sec:对晶格常数进行优化ISIF=3}
+\sectionAuthor{Jiaqi Z.}
+
+% 请在下方的item内填写本节知识点
+\begin{Abstract}
+    \item 如何对晶格常数进行优化？
+    \item 如何固定晶格常数坐标？
+\end{Abstract}
+
+在本节，我们将进一步讨论结构优化，考虑非分子、团簇情况，即对\emph{晶体结构}的结构优化。与分子的情况不同，晶体结构需要考虑晶格常数的大小。在VASP当中，我们使用\code{ISIF=3}表示对晶格常数的优化。
+
+首先，我们会展示一个简单的例子——对晶体硅进行结构优化，接着，我们将以二维材料为例，讨论如何对低维材料（如二维材料、一维材料）进行结构优化。其中，后者由于\emph{真空层}的设置，在优化时可能需要一些其他设置。
+
+\subsection{三维材料结构优化}\label{subsec:对晶格常数进行优化ISIF=3-三维材料结构优化}
+
+首先，我们需要构建Si的晶体结构。借助于Materials Project网站，可以下载到对应晶体的cif文件，并使用如VESTA等软件将其导出至\code{POSCAR}文件。作为练习，你可以参考下面的文件创建你的\code{POSCAR}文件：
+
+\begin{lstlisting}[caption=POSCAR]
+Si2
+1.0
+        3.8669745922         0.0000000000         0.0000000000
+        1.9334872961         3.3488982326         0.0000000000
+        1.9334872961         1.1162994109         3.1573715331
+    Si
+    2
+Direct
+        0.750000000         0.750000000         0.750000000
+        0.500000000         0.500000000         0.500000000
+\end{lstlisting}
+
+可以发现，晶体Si为三方晶系（满足$a=b=c,\alpha=\beta=\gamma\ne90^\circ$）。与优化分子不同，晶体需要同时进行原子坐标优化和\emph{晶格常数}优化。与优化原子坐标类似，如果需要优化晶格常数，需要设置\code{ISIF=3}（其他参数可以参考\ref{sec:对坐标进行优化ISIF=2}一节中的\code{INCAR}设置。下面给了一个可以直接使用的\code{INCAR}文件：
+
+\begin{lstlisting}[caption=INCAR]
+ENCUT  =  600
+LWAVE  = .FALSE.
+LCHARG = .FALSE.
+PREC   = Accurate
+NSW    =  300
+ISMEAR =  0
+SIGMA  =  0.05
+IBRION =  2
+ISIF   =  3
+EDIFFG = -0.01
+\end{lstlisting}
+
+可以直接使用\code{vaspkit-101-LR}生成。
+
+\begin{attention}
+    也可以使用\code{vaspkit-101-SR}生成\code{INCAR}文件，但需要将\code{ISIF}设置为3（vaspkit在这一选项下默认设置为2）
+\end{attention}
+
+与分子不同，对于晶格我们需要设置更多的k点（体现在\code{KPOINTS}文件中），通常在一个方向上的k点个数与晶格常数近似为$ka\sim20$即可。而在实际使用时，我们完全可以借助于vaspkit脚本，使用\code{vaspkit-102-2}生成以Gamma为中心的K点，输入需要使用的K点密度即可生成对应的\code{KPOINTS}文件（同时使用默认配置生成\code{POTCAR}）。我们使用0.06生成的\code{KPOINTS}如下：
+
+\begin{lstlisting}[caption=KPOINTS]
+K-Spacing Value to Generate K-Mesh: 0.060
+0
+Gamma
+   5   5   5
+0.0  0.0  0.0
+\end{lstlisting}
+
+提交上述任务，完成后输出的\code{CONTCAR}文件为：
+
+\begin{lstlisting}[caption=CONTCAR]
+Si2                                     
+1.00000000000000     
+    3.8715704308906274   -0.0000000000000000    0.0000000000000000
+    1.9357852154453137    3.3528783456576567    0.0000000000000420
+    1.9357852154453137    1.1176261152526314    3.1611240196775290
+Si
+    2
+Direct
+0.7500000000000000  0.7500000000000000  0.7500000000000000
+0.5000000000000000  0.5000000000000000  0.5000000000000000
+
+0.00000000E+00  0.00000000E+00  0.00000000E+00
+0.00000000E+00  0.00000000E+00  0.00000000E+00
+\end{lstlisting}
+
+可以发现，晶格常数相较于初始\code{POSCAR}发生了变化。同时，Si-Si键长从2.368 Å变为2.371 Å.
+
+\begin{attention}
+    从原子坐标上看，似乎原子位置没有优化，但由于我们使用的是\emph{分数坐标}，对于同样的原子坐标，不同晶格常数对应不同的键长与原子间相对位置。
+\end{attention}
+
+\subsubsection{*关于vaspkit的k点设置}
+
+\begin{extend}
+    无论你是计算新手还是有一定经验的“老手”，在使用vaspkit时可能产生过疑问：\emph{设置k点时输入的密度（例如0.06）到底是什么}？上面的示例中为什么生成的k点个数就是$5\times5\times5$？这一部分我们试图回答这一问题。
+
+    首先，k点所针对的是倒空间，而我们所使用的\code{POSCAR}都是针对于\emph{实空间}的。通过实空间的晶格基矢，我们可以求得倒空间的基矢。例如，倒空间基矢$\vb{b}_1$就可以用下面的方式计算：
+
+    \begin{equation*}
+        \vb{b}_1 = 2\pi \frac{\vb{\alpha}_2\times\vb{\alpha}_3}{\vb{\alpha}_1\cdot(\vb{\alpha}_2\times\vb{\alpha}_3)}
+    \end{equation*}
+
+    因此，我们可以通过实空间的晶格基矢长度，计算得到倒空间的基矢长度。例如，在本例中，基矢长度就是1.99. 
+
+    而我们输入的密度$n$，则可以定义为$n=b/2\pi k$，其中$b$为倒空间基矢的长度。例如，在本例中，倒空间基矢长度为1.99，则可以带入得到当$n=0.06$时，可得$k\approx5$.
+
+    或者，可以将密度解释为\emph{在$b/2\pi$中平均撒入$k$个点，相邻两点的距离。}
+\end{extend}
+
+\subsection{固定某一晶格常数的优化}\label{subsec:对晶格常数进行优化ISIF=3-固定某一晶格常数的优化}
+
+对于低维材料（本节后续均以二维材料举例），为了避免层与层之间的相互作用，在构建结构时需要在垂直于平面方向的晶格常数设置较大的值（真空层）。以二维\ch{TiS2}为例，在$z$方向设置长度为15 Å的真空层，构建得到的\code{POSCAR}如下所示：
+
+\begin{lstlisting}[caption=POSCAR]
+"Ti1 S2"
+1.0
+        3.4143800735         0.0000000000         0.0000000000
+        -1.7071904305         2.9569396545         0.0000000000
+        0.0000000000         0.0000000000         15.000000000
+    Ti    S
+    1    2
+Direct
+        0.000000000         0.000000000         0.500000000
+        0.666670024         0.333330005         0.579720020
+        0.333330005         0.666670024         0.420280010
+\end{lstlisting}
+
+如果不加以限制，参考前面关于三维材料的结构优化所使用的设置，可以很容易想到（事实也会如此）：\emph{真空层会发生变化}。这在物理上没有实际意义，因此需要想办法对真空层（$c$轴）进行固定。
+
+\subsubsection{使用\code{OPTCELL}文件进行固定}
+
+\begin{extend}
+    使用\code{OPTCELL}之前需要对VASP进行再编译，特别是需要重写文件\code{constr\_cell\_relax.F}。具体的编译原理请参考刘锦程博士的博客\footnote{https://blog.shishiruqi.com//2019/05/05/constr/}，在此不再赘述。
+
+    如果无法配置，请联系你所在课题组的服务器运维人员。
+\end{extend}
+
+在使用\code{OPTCELL}进行固定时，需要创建一个名为\code{OPTCELL}的文件，内部为$3\times3$的矩阵，例如，在本例中我们希望对真空层进行固定，则所创建的文件如下所示：
+
+\begin{lstlisting}[caption=OPTCELL]
+100
+110
+000
+\end{lstlisting}
+
+其中，\emph{1表示对某个坐标分量进行优化，而0表示固定}（不优化）。
+
+\begin{attention}
+    在\code{OPTCELL}当中，所有数字之间没有空格，这与下面要介绍的\code{IOPTCELL}不同。
+\end{attention}
+
+\subsubsection{使用\code{IOPTCELL}进行固定}
+
+肖承诚博士在github上提供了一个补丁\footnote{https://github.com/Chengcheng-Xiao/VASP\_OPT\_AXIS}，可以通过在\code{INCAR}中设置\code{IOPTCELL}参数实现对晶格的固定。其基本原理是对通过构建力矩阵实现固定，假设原始的晶格常数构成一个$3\times3$的矩阵$A_\text{old}$，\code{IOPTCELL}的作用就是设置一个$3\times3$的力矩阵$F$，使得优化后得到的新晶格常数$A_\text{new}=A_\text{old}\times F$在需要固定的方向上元素值为0.
+
+还是以上面的\ch{TiS2}为例，当设置力矩阵$F$为
+\begin{equation*}
+    F=\mqty(1&0&0\\1&1&0\\0&0&0)
+\end{equation*}
+时，可以实现新的晶格常数矩阵为
+\begin{equation*}
+    A_\text{new}=\mqty(1&0&0\\1&1&0\\0&0&0)\cross\mqty(1&0&0\\2&1&0\\0&0&0)
+\end{equation*}
+从而实现对真空层的固定。
+
+在设置时，在\code{INCAR}里面提供参数\code{IOPTCELL}，按照\emph{列顺序}书写（先写第一列，再写第二列，最后写第三列）。一共9个数字\emph{写在同一行}且中间\emph{用空格分隔}。例如，本例则可以设置为\code{IOPTCELL=1 1 0 0 1 0 0 0 0}
