@@ -37,7 +37,7 @@ Cartesian
 0 0 1.2075
 \end{lstlisting}
 
-这里为了设置方便，使用笛卡尔坐标设置原子坐标。在实际应用时，有时可能会借助其他软件如Materials Studio或者VESTA生成\code{POSCAR}文件，此时使用分数坐标（\code{Direct}）也是可以的。
+这里为了设置方便，使用笛卡尔坐标\keywordin{POSCAR}{Cartesian}设置原子坐标。在实际应用时，有时可能会借助其他软件如Materials Studio或者VESTA生成\code{POSCAR}文件，此时使用分数坐标（\keywordin{POSCAR}{Direct}）也是可以的。
 
 \begin{extend}
     如果你将上面的\code{POSCAR}文件放到VESTA文件进行预览的话，可能会发现有8个氧气分子（如图所示）。这并不是因为输入文件设置错了，而是因为VESTA在显示时考虑了周期性，8个氧气分子实际上是等价的。
@@ -68,13 +68,13 @@ EDIFFG = -0.01
 \end{lstlisting}
 
 \begin{itemize}
-    \item \code{ENCUT}：截断能（单位：eV），根据所使用的\code{POTCAR}文件所决定，需要大于所使用\code{POTCAR}当中所有元素\code{ENMAX}的最大值，且通常至少为1.3倍的\code{ENMAX}。在本例中我们设置为600 eV；
-    \item \code{LWAVE}和\code{LCHARG}：是否输出\code{WAVECAR}和\code{CHGCAR}文件（分别为波函数和电荷密度）。由于结构优化时通常不关心这些文件，因此设置为\code{.FALSE.}节省硬盘空间；
-    \item \code{PREC}：计算精度，在进行结构优化时，为确保结构合理，通常设置为\code{Accurate}；
-    \item \code{NSW}：离子弛豫的最大步数。如\ref{subsec:为什么要进行结构优化-结构优化原理}中所介绍的那样，结构优化需要进行多步离子弛豫直到收敛。若离子弛豫步数达到\code{NSW}则直接停止（哪怕没有收敛）；
-    \item \code{ISMEAR}：决定在布里渊区积分时，如何计算分布函数。当设置为0时表示使用Gaussian展宽，其展宽宽度由\code{SIGMA}参数决定（单位：eV）；
-    \item \code{ISIF}：设置为2表示仅优化原子坐标，不优化晶格；
-    \item \code{EDIFFG}：当设置为正值时表示能量收敛标准，当设置为负值时表示原子之间的作用力收敛标准。
+    \item \keywordin{INCAR}{ENCUT}：截断能（单位：eV），根据所使用的\code{POTCAR}文件所决定，需要大于所使用\code{POTCAR}当中所有元素\code{ENMAX}的最大值，且通常至少为1.3倍的\code{ENMAX}。在本例中我们设置为600 eV；
+    \item \keywordin{INCAR}{LWAVE}和\keywordin{INCAR}{LCHARG}：是否输出\code{WAVECAR}和\code{CHGCAR}文件（分别为波函数和电荷密度）。由于结构优化时通常不关心这些文件，因此设置为\code{.FALSE.}节省硬盘空间；
+    \item \keywordin{INCAR}{PREC}：计算精度，在进行结构优化时，为确保结构合理，通常设置为\code{Accurate}；
+    \item \keywordin{INCAR}{NSW}：离子弛豫的最大步数。如\ref{subsec:为什么要进行结构优化-结构优化原理}中所介绍的那样，结构优化需要进行多步离子弛豫直到收敛。若离子弛豫步数达到\code{NSW}则直接停止（哪怕没有收敛）；
+    \item \keywordin{INCAR}{ISMEAR}：决定在布里渊区积分时，如何计算分布函数。当设置为0时表示使用Gaussian展宽，其展宽宽度由\keywordin{INCAR}{SIGMA}参数决定（单位：eV）；
+    \item \keywordin{INCAR}{ISIF}：设置为2表示仅优化原子坐标，不优化晶格；
+    \item \keywordin{INCAR}{EDIFFG}：当设置为正值时表示能量收敛标准，当设置为负值时表示原子之间的作用力收敛标准。
 \end{itemize}
 
 在本例中，我们设置\code{ISIF=2}，这是由于我们所优化的结构为分子体系，并不希望优化外面的晶格参数。除此之外，\code{ISIF}还有其他参数（常见的可能设置为3，在下一节介绍）。同时，通过设置\code{EDIFFG}决定收敛精度，通常设置为\code{-0.01}就已经达到了一般研究所需要的精度，但对于更高精度需求（例如计算声子谱），则可能需要到\code{-1E-3}的精度。
@@ -132,7 +132,7 @@ DAV:   2    -0.880305353569E+01   -0.53592E-04   -0.50512E-04   192   0.455E-03
     5 F= -.88030535E+01 E0= -.87748689E+01  d E =-.356016E-01    
 \end{lstlisting}
 
-其中每一个\code{DAV}开头的行表示\emph{电子步}，当电子步达到收敛条件时则会计算\emph{离子步}。在本例中，程序一共计算了5个离子步而达到收敛条件，从而结束计算。
+其中每一个\keywordin{OSZICAR}{DAV}开头的行表示\emph{电子步}，当电子步达到收敛条件时则会计算\emph{离子步}。在本例中，程序一共计算了5个离子步而达到收敛条件，从而结束计算。
 
 \begin{extend}
     在本例中，我们没有提供电子步的收敛条件。在VASP中，电子步的收敛是由\code{EDIFF}参数决定，默认为\code{1E-4}，单位为eV。

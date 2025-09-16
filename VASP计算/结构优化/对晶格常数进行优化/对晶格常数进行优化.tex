@@ -125,7 +125,7 @@ Direct
 \subsubsection{使用\code{OPTCELL}文件进行固定}
 
 \begin{extend}
-    使用\code{OPTCELL}之前需要对VASP进行再编译，特别是需要重写文件\code{constr\_cell\_relax.F}。具体的编译原理请参考刘锦程博士的博客\footnote{https://blog.shishiruqi.com//2019/05/05/constr/}，在此不再赘述。
+    使用\keyword{OPTCELL}之前需要对VASP进行再编译，特别是需要重写文件\code{constr\_cell\_relax.F}。具体的编译原理请参考刘锦程博士的博客\footnote{https://blog.shishiruqi.com//2019/05/05/constr/}，在此不再赘述。
 
     如果无法配置，请联系你所在课题组的服务器运维人员。
 \end{extend}
@@ -146,7 +146,7 @@ Direct
 
 \subsubsection{使用\code{IOPTCELL}进行固定}
 
-肖承诚博士在github上提供了一个补丁\footnote{https://github.com/Chengcheng-Xiao/VASP\_OPT\_AXIS}，可以通过在\code{INCAR}中设置\code{IOPTCELL}参数实现对晶格的固定。其基本原理是对通过构建力矩阵实现固定，假设原始的晶格常数构成一个$3\times3$的矩阵$A_\text{old}$，\code{IOPTCELL}的作用就是设置一个$3\times3$的力矩阵$F$，使得优化后得到的新晶格常数$A_\text{new}=A_\text{old}\times F$在需要固定的方向上元素值为0.
+肖承诚博士在github上提供了一个补丁\footnote{https://github.com/Chengcheng-Xiao/VASP\_OPT\_AXIS}，可以通过在\code{INCAR}中设置\keywordin{INCAR}{IOPTCELL}参数实现对晶格的固定。其基本原理是对通过构建力矩阵实现固定，假设原始的晶格常数构成一个$3\times3$的矩阵$A_\text{old}$，\code{IOPTCELL}的作用就是设置一个$3\times3$的力矩阵$F$，使得优化后得到的新晶格常数$A_\text{new}=A_\text{old}\times F$在需要固定的方向上元素值为0.
 
 还是以上面的\ch{TiS2}为例，当设置力矩阵$F$为
 \begin{equation*}
