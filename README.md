@@ -31,7 +31,10 @@ A repository for notes and resources related to our computational materials rese
   - 高级Linux命令
   - Shell脚本基础
 - VASP计算
+  - 结构优化
+  - 静态自洽与电荷密度
   - 能带计算
+  - 态密度计算
   - 声子谱计算
 - Python与机器学习
   - 基础Python语法
