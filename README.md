@@ -41,12 +41,13 @@ A repository for notes and resources related to our computational materials rese
 
 ## 如何为本教程做出贡献
 
-请根据目录下`如何按照格式规范编写.md`所述要求与流程，并参考`temp.tex`和`sample.tex`文件所提供的模板，提交Pull Request。
+- 最专业的方法：请根据目录下`如何按照格式规范编写.md`所述要求与流程，并参考`temp.tex`和`sample.tex`文件所提供的模板，提交Pull Request。
+- 如果想贡献教程但没有能力：可以通过邮箱（zhangjq_sd@163.com）投稿，投稿方式支持word。请使用投稿模板投稿，投稿结果将通过邮箱告知。发送邮件时请注明相关内容。
 
 ## 反馈问题
 若发现笔记中有任何问题, 可通过以下任意一种方式联系:
 - GitHub的Issue, 这是最直接的方式;
-- email, 请发送邮件至zhangjq00@sdust.edu.cn
+- email, 请发送邮件至zhangjq_sd@163.com
 
 ## 关于本教程的版权使用说明
 
